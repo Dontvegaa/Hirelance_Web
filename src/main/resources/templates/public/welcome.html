@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hirelance - Descubre los mejores proyectos freelance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#f97316', // Naranja
+                        'secondary': '#000000', // Negro
+                        'accent': '#1f2937' // Gris oscuro
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-secondary text-white">
+<header class="bg-secondary border-b border-gray-800">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center">
+            <a href="/welcome" class="text-2xl font-bold text-primary"><img th:src="@{/static/img/Hirelance-Logo-grupo19.png.png}"  class="h-24 w-29 " alt="Hirelance Logo"></a>
+        </div>
+        <nav class="hidden md:flex space-x-6">
+            <a href="/welcome." class="text-primary font-medium">Inicio</a>
+            <a href="/explore" class="hover:text-primary transition">Explorar</a>
+            <a href="#" class="hover:text-primary transition">Cómo funciona</a>
+        </nav>
+        <div class="flex items-center space-x-4">
+            <a href="/login" class="hover:text-primary transition">Iniciar Sesión</a>
+            <a href="/register" class="bg-primary hover:bg-orange-600 text-white px-4 py-2 rounded-md transition">Registrarse</a>
+        </div>
+    </div>
+</header>
+
+<section class="bg-gradient-to-r from-secondary to-accent py-20">
+    <div class="container mx-auto px-4 text-center">
+        <h1 class="text-5xl font-bold mb-6">Descubre los mejores proyectos freelance</h1>
+        <p class="text-xl mb-10 max-w-2xl mx-auto">Conecta con talento excepcional o encuentra proyectos que impulsen tu carrera</p>
+        <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <a href="/register-estudiante" class="bg-primary hover:bg-orange-600 text-white px-8 py-3 rounded-md text-lg font-medium transition">Soy Freelancer</a>
+            <a href="/register-contratista" class="bg-white hover:bg-gray-200 text-secondary px-8 py-3 rounded-md text-lg font-medium transition">Busco Talento</a>
+        </div>
+    </div>
+</section>
+
+<section class="py-16 bg-accent">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12">Categorías Populares</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8" th:if="${categorias != null and !categorias.isEmpty()}">
+            <div class="bg-secondary p-6 rounded-lg border border-gray-800 hover:border-primary transition"
+                 th:each="categoria : ${categorias}">
+                <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-palette text-white text-xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2" th:text="${categoria.nombre}">Diseño UI/UX</h3>
+                <p class="text-gray-400" th:text="${categoria.descripcion}">Descripción de la categoría</p>
+            </div>
+        </div>
+        <div class="text-center text-gray-400" th:if="${categorias == null or categorias.isEmpty()}">
+            <p>No hay categorías populares disponibles en este momento.</p>
+        </div>
+    </div>
+</section>
+
+<footer class="bg-secondary border-t border-gray-800 py-8">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <a href="/welcome" class="text-2xl font-bold text-primary"><img th:src="@{/static/img/Hirelance-Logo-grupo19.png.png}"  class="h-24 w-29 " alt="Hirelance Logo"></a>
+                <p class="text-gray-400 mt-2">Conectando talento con oportunidades</p>
+            </div>
+            <div class="flex space-x-4">
+                <a href="#" class="text-gray-400 hover:text-primary transition">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-primary transition">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-primary transition">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-primary transition">
+                    <i class="fab fa-instagram"></i>
+                </a>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2025 Hirelance. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
