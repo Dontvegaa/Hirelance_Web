@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cómo Funciona - Hirelance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-black text-white">
+
+<header class="bg-black border-b border-gray-800">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center">
+            <a href="/" class="text-2xl font-bold text-orange-500">
+                <img th:src="@{/img/Hirelance-Logo-grupo19.png.png}" class="h-24 w-29" alt="Hirelance Logo">
+            </a>
+        </div>
+        <nav class="hidden md:flex space-x-6">
+            <a href="/" class="hover:text-orange-500 transition">Inicio</a>
+            <a href="/explore" class="hover:text-orange-500 transition">Explorar</a>
+            <a href="/how-it-works" class="text-orange-500 font-medium">Cómo funciona</a>
+        </nav>
+        <div class="flex items-center space-x-4">
+            <a href="/login" class="hover:text-orange-500 transition">Iniciar Sesión</a>
+            <a href="/register" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md transition">Registrarse</a>
+        </div>
+    </div>
+</header>
+<section class="bg-gray-900 py-20 text-center">
+    <div class="container mx-auto px-4">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 text-orange-500">¿Cómo Funciona Hirelance?</h1>
+        <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+            Conectamos talento estudiantil con proyectos reales. Es simple, rápido y efectivo.
+        </p>
+    </div>
+</section>
+
+<section class="py-16">
+    <div class="container mx-auto px-4">
+
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-2">Para Contratistas (Clientes)</h2>
+            <p class="text-gray-400">Encuentra al estudiante perfecto para tu proyecto.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 text-center">
+                <div class="text-5xl text-orange-500 mb-4"><i class="fas fa-file-alt"></i></div>
+                <h3 class="text-xl font-bold mb-2">1. Publica tu Proyecto</h3>
+                <p class="text-gray-400">Regístrate, describe tu proyecto, establece tu presupuesto y define las habilidades que necesitas.</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 text-center">
+                <div class="text-5xl text-orange-500 mb-4"><i class="fas fa-users"></i></div>
+                <h3 class="text-xl font-bold mb-2">2. Revisa Postulaciones</h3>
+                <p class="text-gray-400">Estudiantes talentosos de todo El Salvador verán tu proyecto y te enviarán sus propuestas.</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 text-center">
+                <div class="text-5xl text-orange-500 mb-4"><i class="fas fa-handshake"></i></div>
+                <h3 class="text-xl font-bold mb-2">3. Contrata y Gestiona</h3>
+                <p class="text-gray-400">Elige la mejor postulación, contacta al estudiante y gestiona el trabajo desde tu panel.</p>
+            </div>
+        </div>
+
+        <hr class="border-gray-800 w-1/2 mx-auto my-16">
+
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-2">Para Estudiantes (Talento)</h2>
+            <p class="text-gray-400">Gana experiencia, construye tu portafolio y obtén ingresos.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 text-center">
+                <div class="text-5xl text-orange-500 mb-4"><i class="fas fa-user-graduate"></i></div>
+                <h3 class="text-xl font-bold mb-2">1. Crea tu Perfil</h3>
+                <p class="text-gray-400">Regístrate, añade tus habilidades, tu carrera, y sube tus mejores proyectos a tu portafolio.</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 text-center">
+                <div class="text-5xl text-orange-500 mb-4"><i class="fas fa-search"></i></div>
+                <h3 class="text-xl font-bold mb-2">2. Explora Proyectos</h3>
+                <p class="text-gray-400">Navega en la página de "Explorar" y filtra proyectos que coincidan con tus habilidades.</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 text-center">
+                <div class="text-5xl text-orange-500 mb-4"><i class="fas fa-paper-plane"></i></div>
+                <h3 class="text-xl font-bold mb-2">3. Envía tu Postulación</h3>
+                <p class="text-gray-400">¿Encontraste un proyecto genial? Envía una postulación profesional y explica por qué eres el indicado.</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<section class="bg-orange-500 py-16 text-center">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-white mb-6">¿Listo para comenzar?</h2>
+        <div class="flex flex-wrap justify-center gap-4">
+            <a href="/register-estudiante" class="bg-black text-white px-6 py-3 rounded-md font-medium text-lg hover:bg-gray-800 transition">
+                Registrarme como Estudiante
+            </a>
+            <a href="/register-contratista" class="bg-white text-orange-500 px-6 py-3 rounded-md font-medium text-lg hover:bg-gray-100 transition">
+                Publicar un Proyecto
+            </a>
+        </div>
+    </div>
+</section>
+
+<footer class="bg-black border-t border-gray-800 py-8">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <a href="/" class="text-2xl font-bold text-orange-500">
+                    <img th:src="@{/img/Hirelance-Logo-grupo19.png.png}" class="h-24 w-29" alt="Hirelance Logo">
+                </a>
+                <p class="text-gray-400 mt-2">Conectando talento con oportunidades</p>
+            </div>
+            <div class="flex space-x-4">
+                <a href="#" class="text-gray-400 hover:text-orange-500 transition"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="text-gray-400 hover:text-orange-500 transition"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-gray-400 hover:text-orange-500 transition"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" class="text-gray-400 hover:text-orange-500 transition"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2025 Hirelance. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

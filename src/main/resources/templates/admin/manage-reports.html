@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver Reportes - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-black text-white flex">
+
+<aside class="w-64 min-h-screen bg-gray-900 border-r border-gray-800 p-6">
+    <a href="/admin/dashboard" class="text-2xl font-bold text-orange-500">Hirelance (Admin)</a>
+    <nav class="mt-10">
+        <a href="/admin/dashboard" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-shield-alt w-6 mr-2"></i> Dashboard
+        </a>
+        <a href="/admin/manage-users" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-users-cog w-6 mr-2"></i> Gestionar Usuarios
+        </a>
+        <a href="/admin/manage-projects" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-project-diagram w-6 mr-2"></i> Gestionar Proyectos
+        </a>
+        <a href="/admin/manage-universities" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-university w-6 mr-2"></i> Gestionar Universidades
+        </a>
+        <a href="/admin/manage-categories" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tags w-6 mr-2"></i> Gestionar Categorías
+        </a>
+        <a href="/admin/manage-skills" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-cogs w-6 mr-2"></i> Gestionar Habilidades
+        </a>
+        <a href="/admin/manage-reviews" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-star w-6 mr-2"></i> Gestionar Valoraciones
+        </a>
+        <a href="/admin/manage-contracts" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-file-signature w-6 mr-2"></i> Gestionar Contratos
+        </a>
+        <a href="/admin/manage-reports" class="block py-2 px-4 bg-orange-500 text-white rounded">
+            <i class="fas fa-flag w-6 mr-2"></i> Ver Reportes
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1">
+    <header class="bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Ver Reportes</h1>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition">
+                <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+            </button>
+        </form>
+    </header>
+
+    <div class="p-8">
+
+        <div class="mb-6 p-4 bg-gray-800 rounded-lg border border-gray-700">
+            <form th:action="@{/admin/manage-reports}" method="GET" class="space-y-4 md:space-y-0 md:flex md:gap-4">
+
+                <div class="flex-grow">
+                    <label for="busqueda" class="text-sm font-medium text-gray-400">Buscar (Descripción, Correo)</label>
+                    <input type="text" name="busqueda" id="busqueda" th:value="${busqueda}"
+                           class="w-full mt-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                           placeholder="Buscar...">
+                </div>
+
+                <div class="w-full md:w-1/5">
+                    <label for="tipo" class="text-sm font-medium text-gray-400">Filtrar por Tipo</label>
+                    <select name="tipo" id="tipo"
+                            class="w-full mt-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <option value="all">Todos los Tipos</option>
+                        <option th:each="t : ${tiposReporte}"
+                                th:value="${t.name()}"
+                                th:text="${t.name()}"
+                                th:selected="${t.name() == tipoSeleccionado}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="w-full md:w-1/5">
+                    <label for="estado" class="text-sm font-medium text-gray-400">Filtrar por Estado</label>
+                    <select name="estado" id="estado"
+                            class="w-full mt-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <option value="all">Todos los Estados</option>
+                        <option th:each="e : ${estadosReporte}"
+                                th:value="${e.name()}"
+                                th:text="${e.name()}"
+                                th:selected="${e.name() == estadoSeleccionado}">
+                        </option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full md:w-auto bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md transition self-end">
+                    Filtrar
+                </button>
+            </form>
+        </div>
+        <div class="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-800">
+                <thead class="bg-gray-800">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Usuario</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Tipo</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Descripción</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-800">
+
+                <tr th:each="reporte : ${reportes}">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                        <span th:if="${reporte.usuario != null}" th:text="${reporte.usuario.correo}"></span>
+                        <span th:if="${reporte.usuario == null}" class="text-gray-600">N/A</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium capitalize" th:text="${reporte.tipo.name()}">Bug</td>
+                    <td class="px-6 py-4 max-w-sm">
+                        <p class="text-sm text-gray-300 line-clamp-2" th:text="${reporte.descripcion}">
+                            Descripción del problema...
+                        </p>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                        <span th:text="${#temporals.format(reporte.fechaReporte, 'dd-MM-yyyy HH:mm')}"></span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                                <span th:text="${reporte.estado.name()}"
+                                      th:classappend="${reporte.estado.name() == 'pendiente'} ? 'bg-yellow-700 text-yellow-300' :
+                                                     (${reporte.estado.name() == 'en_revision'} ? 'bg-blue-700 text-blue-300' : 'bg-green-700 text-green-300')"
+                                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize">
+                                    Pendiente
+                                </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a th:href="@{/admin/manage-reports/{id}/details(id=${reporte.idReporte})}" class="text-blue-500 hover:text-blue-400">
+                            Ver Detalles
+                        </a>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(reportes)}">
+                    <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                        ¡No hay reportes! Todo en orden.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+</body>
+</html>

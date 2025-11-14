@@ -1,10 +1,206 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-black text-white flex">
+
+<aside class="w-64 min-h-screen bg-gray-900 border-r border-gray-800 p-6">
+    <a href="/admin/dashboard" class="text-2xl font-bold text-orange-500">Hirelance (Admin)</a>
+    <nav class="mt-10">
+        <a href="/admin/dashboard" class="block py-2 px-4 bg-orange-500 text-white rounded">
+            <i class="fas fa-shield-alt w-6 mr-2"></i> Dashboard
+        </a>
+        <a href="/admin/manage-users" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-users-cog w-6 mr-2"></i> Gestionar Usuarios
+        </a>
+        <a href="/admin/manage-projects" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-project-diagram w-6 mr-2"></i> Gestionar Proyectos
+        </a>
+        <a href="/admin/manage-universities" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-university w-6 mr-2"></i> Gestionar Universidades
+        </a>
+        <a href="/admin/manage-categories" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tags w-6 mr-2"></i> Gestionar Categorías
+        </a>
+        <a href="/admin/manage-skills" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-cogs w-6 mr-2"></i> Gestionar Habilidades
+        </a>
+        <a href="/admin/manage-reviews" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-star w-6 mr-2"></i> Gestionar Valoraciones
+        </a>
+        <a href="/admin/manage-contracts" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-file-signature w-6 mr-2"></i> Gestionar Contratos
+        </a>
+        <a href="/admin/manage-reports" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-flag w-6 mr-2"></i> Ver Reportes
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1">
+    <header class="bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center">
+        <h1 class="text-2xl font-bold" th:text="'Panel de Administrador - ' + ${nombreAdmin}">Panel de Admin</h1>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition">
+                <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+            </button>
+        </form>
+    </header>
+
+    <div class="p-8">
+        <h2 class="text-2xl font-bold mb-6">Estadísticas Globales</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-blue-500 rounded-full">
+                        <i class="fas fa-users text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-400">Usuarios Totales</p>
+                        <p class="text-3xl font-bold" th:text="${totalUsuarios}">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-green-500 rounded-full">
+                        <i class="fas fa-tasks text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-400">Proyectos Totales</p>
+                        <p class="text-3xl font-bold" th:text="${totalProyectos}">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-indigo-500 rounded-full">
+                        <i class="fas fa-file-alt text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-400">Postulaciones</p>
+                        <p class="text-3xl font-bold" th:text="${totalPostulaciones}">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-900 border border-red-700 rounded-lg p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-red-500 rounded-full">
+                        <i class="fas fa-flag text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-400">Reportes Pendientes</p>
+                        <p class="text-3xl font-bold text-red-400" th:text="${reportesPendientes}">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gray-900 border border-gray-800 rounded-lg">
+
+            <div class="border-b border-gray-800">
+                <nav class="flex -mb-px" aria-label="Tabs">
+                    <button onclick="changeTab(this, 'usuarios')"
+                            class="tab-btn active-tab-btn group w-1/3 py-4 px-1 text-center border-b-2 font-medium text-sm">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Nuevos Usuarios
+                    </button>
+                    <button onclick="changeTab(this, 'proyectos')"
+                            class="tab-btn inactive-tab-btn group w-1/3 py-4 px-1 text-center border-b-2 font-medium text-sm">
+                        <i class="fas fa-tasks mr-2"></i>
+                        Nuevos Proyectos
+                    </button>
+                    <button onclick="changeTab(this, 'reportes')"
+                            class="tab-btn inactive-tab-btn group w-1/3 py-4 px-1 text-center border-b-2 font-medium text-sm">
+                        <i class="fas fa-flag mr-2"></i>
+                        Nuevos Reportes
+                    </button>
+                </nav>
+            </div>
+
+            <div class="p-6">
+
+                <div id="tab-usuarios" class="tab-panel space-y-4">
+                    <div th:if="${#lists.isEmpty(usuariosRecientes)}" class="text-gray-500 text-center py-4">
+                        No hay usuarios registrados recientemente.
+                    </div>
+                    <div th:each="user : ${usuariosRecientes}" class="flex justify-between items-center bg-gray-800 p-4 rounded-lg">
+                        <div>
+                            <p class="font-medium" th:text="${user.nombre} + ' ' + ${user.apellido}"></p>
+                            <p class="text-sm text-gray-400" th:text="${user.correo}"></p>
+                        </div>
+                        <div class="text-right">
+                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-700 text-blue-300 capitalize" th:text="${user.tipo.name()}"></span>
+                            <a th:href="@{/admin/manage-users/{id}/view(id=${user.idUsuario})}" class="text-orange-500 hover:text-orange-400 text-sm font-medium block mt-2">
+                                Ver Detalles &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-proyectos" class="tab-panel space-y-4 hidden">
+                    <div th:if="${#lists.isEmpty(proyectosRecientes)}" class="text-gray-500 text-center py-4">
+                        No hay proyectos creados recientemente.
+                    </div>
+                    <div th:each="proj : ${proyectosRecientes}" class="flex justify-between items-center bg-gray-800 p-4 rounded-lg">
+                        <div>
+                            <p class="font-medium" th:text="${proj.titulo}"></p>
+                            <p class="text-sm text-gray-400" th:text="'Por: ' + ${proj.contratista?.nombre} ?: 'Usuario desconocido'"></p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-orange-500 font-medium" th:text="'$' + ${#numbers.formatDecimal(proj.presupuesto, 1, 2)}"></span>
+                            <a th:href="@{/admin/manage-projects/{id}/details(id=${proj.idProyecto})}" class="text-orange-500 hover:text-orange-400 text-sm font-medium block mt-2">
+                                Ver Detalles &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-reportes" class="tab-panel space-y-4 hidden">
+                    <div th:if="${#lists.isEmpty(reportesRecientes)}" class="text-gray-500 text-center py-4">
+                        No hay reportes recientes.
+                    </div>
+                    <div th:each="reporte : ${reportesRecientes}" class="flex justify-between items-center bg-gray-800 p-4 rounded-lg">
+                        <div>
+                            <p class="text-sm text-gray-400" th:text="${reporte.usuario?.correo} ?: 'N/A'"></p>
+                            <p class="font-medium line-clamp-1" th:text="${reporte.descripcion}">Descripción del reporte...</p>
+                        </div>
+                        <div class="text-right">
+                        <span th:text="${reporte.estado.name()}"
+                              th:classappend="${reporte.estado.name() == 'pendiente'} ? 'bg-yellow-700 text-yellow-300' : 'bg-green-700 text-green-300'"
+                              class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full capitalize">
+                        </span>
+                            <a th:href="@{/admin/manage-reports/{id}/details(id=${reporte.idReporte})}" class="text-orange-500 hover:text-orange-400 text-sm font-medium block mt-2">
+                                Ver Detalles &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+</main>
+
+<script th:src="@{/js/admin-dashboard-tabs.js}"></script>
+
+<style>
+    .line-clamp-1 {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
 
 </body>
 </html>

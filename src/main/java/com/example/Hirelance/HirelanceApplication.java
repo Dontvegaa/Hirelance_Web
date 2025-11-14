@@ -14,8 +14,4 @@ public class HirelanceApplication {
         SpringApplication.run(HirelanceApplication.class, args);
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 }

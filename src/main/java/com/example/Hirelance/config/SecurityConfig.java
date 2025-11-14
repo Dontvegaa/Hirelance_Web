@@ -2,13 +2,27 @@ package com.example.Hirelance.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private CustomAuthenticationSuccessHandler successHandler;
+
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -18,6 +32,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/welcome",
+                                "/how-it-works",
                                 "/login",
                                 "/register",
                                 "/register-estudiante",
@@ -39,7 +54,7 @@ public class SecurityConfig {
                         // --- CONFIGURAR TU PROPIO LOGIN ---
                         .loginPage("/login") // Le dice a Spring cuál es TU página de login
                         .loginProcessingUrl("/login") // La URL a la que el form de login.html debe enviar los datos
-                        .defaultSuccessUrl("/welcome", true) // A dónde ir después de un login exitoso
+                        .successHandler(successHandler) // ¡USA TU NUEVO MANEJADOR!
                         .permitAll() // Permite que todos vean tu página de login
                 )
                 .logout(logout -> logout

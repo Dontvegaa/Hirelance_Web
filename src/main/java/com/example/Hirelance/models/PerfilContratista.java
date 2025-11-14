@@ -26,6 +26,7 @@ public class PerfilContratista {
     @Column(name = "sitio_web")
     private String sitioWeb;
 
-    @Column(name = "logo_empresa")
-    private String logoEmpresa; // (Guardaremos la ruta/nombre del archivo)
+    @Lob // Indica que es un "Large Object"
+    @Column(columnDefinition = "MEDIUMBLOB")
+    private byte[] logoEmpresa; // (Guardaremos los bytes)
 }

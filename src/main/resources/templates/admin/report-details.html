@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Reporte - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-black text-white flex">
+
+<aside th:insert="~{admin/manage-reports :: aside}"></aside>
+
+<main class="flex-1">
+    <header class="bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center">
+        <div>
+            <a th:href="@{/admin/manage-reports}" class="text-sm text-orange-500 hover:underline">
+                &larr; Volver a Ver Reportes
+            </a>
+            <h1 class="text-2xl font-bold" th:text="'Detalle del Reporte #' + ${reporte.idReporte}">Detalle de Reporte</h1>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition">Cerrar Sesión</button>
+        </form>
+    </header>
+
+    <div class="p-8">
+        <div class="max-w-4xl mx-auto bg-gray-900 border border-gray-800 rounded-lg">
+
+            <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 border-b border-gray-800">
+                <div>
+                    <p class="text-sm text-gray-400">Usuario (Emisor)</p>
+                    <p class="text-lg font-medium" th:text="${reporte.usuario?.correo} ?: 'N/A'"></p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-400">Tipo de Reporte</p>
+                    <p class="text-lg font-medium capitalize" th:text="${reporte.tipo.name()}"></p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-400">Fecha</p>
+                    <p class="text-lg font-medium" th:text="${#temporals.format(reporte.fechaReporte, 'dd-MM-yyyy HH:mm')}"></p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-400">Estado</p>
+                    <span th:text="${reporte.estado.name()}"
+                          th:classappend="${reporte.estado.name() == 'pendiente'} ? 'bg-yellow-700 text-yellow-300' :
+                                             (${reporte.estado.name() == 'en_revision'} ? 'bg-blue-700 text-blue-300' : 'bg-green-700 text-green-300')"
+                          class="px-3 py-1 inline-flex text-base leading-5 font-semibold rounded-full capitalize">
+                        </span>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <h3 class="text-xl font-bold mb-4">Descripción Completa</h3>
+                <div class="bg-gray-800 p-4 rounded-lg min-h-[100px]">
+                    <p class="text-gray-300 whitespace-pre-wrap" th:text="${reporte.descripcion}"></p>
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-gray-800 text-right space-x-4">
+
+                <form th:if="${reporte.estado.name() == 'pendiente'}"
+                      th:action="@{/admin/manage-reports/{id}/review(id=${reporte.idReporte})}"
+                      method="POST" class="inline-block">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md transition">
+                        <i class="fas fa-eye mr-2"></i> Marcar en Revisión
+                    </button>
+                </form>
+
+                <form th:if="${reporte.estado.name() != 'resuelto'}"
+                      th:action="@{/admin/manage-reports/{id}/resolve(id=${reporte.idReporte})}"
+                      method="POST" class="inline-block">
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md transition">
+                        <i class="fas fa-check-circle mr-2"></i> Marcar como Resuelto
+                    </button>
+                </form>
+
+                <span th:if="${reporte.estado.name() == 'resuelto'}" class="text-green-400 font-medium">
+                    <i class="fas fa-check-circle mr-2"></i> Este reporte ya fue resuelto.
+                </span>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

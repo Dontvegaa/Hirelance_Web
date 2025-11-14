@@ -2,6 +2,8 @@ package com.example.Hirelance.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -13,8 +15,10 @@ public class PerfilEstudiante {
     @Column(name = "id_perfil")
     private Integer idPerfil;
 
-    @OneToOne
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Usuario usuario;
 
     private String carrera;
@@ -28,8 +32,9 @@ public class PerfilEstudiante {
     @Column(name = "portafolio_url")
     private String portafolioUrl;
 
-    @Column(name = "foto_perfil")
-    private String fotoPerfil; // (Guardaremos la ruta/nombre del archivo)
+    @Lob // Indica que es un "Large Object"
+    @Column(columnDefinition = "MEDIUMBLOB")
+    private byte[] fotoPerfil; // (Guardaremos los bytes)
 
     // Faltan las relaciones con Universidad y Habilidades,
     // pero las omitimos por ahora para simplificar el registro inicial.

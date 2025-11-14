@@ -1,10 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Talento - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-black text-white flex">
+
+<aside class="w-64 min-h-screen bg-gray-900 border-r border-gray-800 p-6">
+    <a href="/client/dashboard" class="text-2xl font-bold text-orange-500">Hirelance</a>
+    <nav class="mt-10">
+        <a href="/client/dashboard" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tachometer-alt w-6 mr-2"></i> Dashboard
+        </a>
+        <a href="/client/post-project" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-plus w-6 mr-2"></i> Publicar Proyecto
+        </a>
+        <a href="/client/my-projects" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tasks w-6 mr-2"></i> Mis Proyectos
+        </a>
+        <a href="/client/search-freelancer" class="block py-2 px-4 bg-orange-500 text-white rounded">
+            <i class="fas fa-search w-6 mr-2"></i> Buscar Talento
+        </a>
+        <a href="/client/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
+        </a>
+        <a href="/client/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-user w-6 mr-2"></i> Mi Perfil
+        </a>
+        <a href="/client/settings" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-cog w-6 mr-2"></i> Ajustes
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1">
+    <header class="bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Buscar Talento</h1>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition">
+                Cerrar Sesión
+            </button>
+        </form>
+    </header>
+
+    <div class="p-8">
+
+        <div class="max-w-3xl mx-auto relative mb-8">
+            <form th:action="@{/client/search-freelancer}" method="get" id="searchForm">
+                <input type="hidden" name="habilidad" th:value="${habilidadSeleccionada}">
+                <input type="text"
+                       name="busqueda"
+                       th:value="${busqueda}"
+                       placeholder="Buscar por nombre, carrera, etc..."
+                       class="w-full px-6 py-4 bg-gray-800 border border-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500"
+                       id="searchInput">
+                <button type="submit" class="absolute right-2 top-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-full transition">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+
+        <div class="flex flex-wrap gap-2 mb-8 justify-center">
+            <a th:href="@{/client/search-freelancer(habilidad='all', busqueda=${busqueda})}"
+               th:class="${habilidadSeleccionada == 'all'} ?
+                       'bg-orange-500 text-white px-4 py-2 rounded-md text-sm transition' :
+                       'bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm transition'">
+                Todos
+            </a>
+            <th:block th:each="habilidad : ${habilidades}">
+                <a th:href="@{/client/search-freelancer(habilidad=${habilidad.titulo}, busqueda=${busqueda})}"
+                   th:class="${habilidadSeleccionada == habilidad.titulo} ?
+                           'bg-orange-500 text-white px-4 py-2 rounded-md text-sm transition' :
+                           'bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm transition'"
+                   th:text="${habilidad.titulo}">
+                </a>
+            </th:block>
+        </div>
+
+        <hr class="border-gray-800 mb-8">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+            <th:block th:each="vm : ${estudiantes}">
+                <div class="bg-gray-900 rounded-lg border border-gray-800 overflow-hidden hover:border-orange-500 transition">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div th:if="${vm.base64Image == null}" class="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user-graduate text-white text-2xl"></i>
+                            </div>
+                            <img th:if="${vm.base64Image != null}"
+                                 th:src="'data:image/jpeg;base64,' + ${vm.base64Image}"
+                                 alt="Foto de perfil" class="w-16 h-16 rounded-full object-cover">
+
+                            <div class="ml-4">
+                                <h3 class="text-xl font-bold" th:text="${vm.usuario.nombre} + ' ' + ${vm.usuario.apellido}">Nombre Estudiante</h3>
+                                <p class="text-orange-500" th:text="${vm.usuario.perfilEstudiante?.carrera}">Carrera</p>
+                            </div>
+                        </div>
+
+                        <p class="text-gray-400 text-sm mb-4 line-clamp-3"
+                           th:text="${vm.usuario.perfilEstudiante?.descripcion != null ? vm.usuario.perfilEstudiante.descripcion : 'Estudiante sin descripción.'}">
+                            Descripción del estudiante...
+                        </p>
+
+                        <div class="text-right">
+                            <a href="/client/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+                                <i class="fas fa-user w-6 mr-2"></i> Mi Perfil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </th:block>
+
+            <th:block th:if="${#lists.isEmpty(estudiantes)}">
+                <div class="col-span-3 text-center py-12">
+                    <i class="fas fa-user-graduate text-6xl text-gray-600 mb-4"></i>
+                    <h3 class="text-2xl font-bold text-gray-400">No se encontraron estudiantes</h3>
+                    <p class="text-gray-500 mt-2" th:if="${busqueda != null}">
+                        No se encontraron perfiles para "<span th:text="${busqueda}" class="text-orange-500"></span>"
+                    </p>
+                    <p class="text-gray-500 mt-2" th:if="${busqueda == null}">
+                        No hay perfiles de estudiantes disponibles.
+                    </p>
+                </div>
+            </th:block>
+        </div>
+
+    </div>
+</main>
+
+<style>
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
 
 </body>
 </html>

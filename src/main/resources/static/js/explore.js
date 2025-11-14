@@ -1,217 +1,110 @@
-// Funcionalidad para pestañas de exploración
+// explore.js - Funcionalidad para la página de exploración
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Tabs de proyectos/talentos
-    const tabProyectos = document.getElementById('tab-proyectos');
-    const tabTalentos = document.getElementById('tab-talentos');
-    const proyectosSection = document.getElementById('proyectos-section');
-    const talentosSection = document.getElementById('talentos-section');
+    // Configuración de búsqueda en tiempo real (opcional)
+    const searchInput = document.getElementById('searchInput');
+    const searchForm = document.getElementById('searchForm');
 
-    if (tabProyectos && tabTalentos) {
-        tabProyectos.addEventListener('click', function() {
-            this.classList.add('text-primary', 'border-primary');
-            this.classList.remove('text-gray-400', 'border-transparent');
-
-            tabTalentos.classList.remove('text-primary', 'border-primary');
-            tabTalentos.classList.add('text-gray-400', 'border-transparent');
-
-            proyectosSection.classList.remove('hidden');
-            talentosSection.classList.add('hidden');
+    if (searchInput && searchForm) {
+        // Opcional: Búsqueda en tiempo real con debounce
+        let searchTimeout;
+        searchInput.addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                // Si quieres búsqueda en tiempo real, descomenta esta línea:
+                // searchForm.submit();
+            }, 500);
         });
 
-        tabTalentos.addEventListener('click', function() {
-            this.classList.add('text-primary', 'border-primary');
-            this.classList.remove('text-gray-400', 'border-transparent');
-
-            tabProyectos.classList.remove('text-primary', 'border-primary');
-            tabProyectos.classList.add('text-gray-400', 'border-transparent');
-
-            talentosSection.classList.remove('hidden');
-            proyectosSection.classList.add('hidden');
+        // Enter para buscar inmediatamente
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchForm.submit();
+            }
         });
     }
 
-    // Filtros de proyectos
-    const projectFilters = document.querySelectorAll('.project-filter');
-    const projectCards = document.querySelectorAll('[data-category]');
+    // Efectos de hover para las tarjetas
+    const projectCards = document.querySelectorAll('.bg-gray-800.rounded-lg');
+    projectCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.transition = 'transform 0.3s ease';
+        });
 
-    projectFilters.forEach(filter => {
-        filter.addEventListener('click', function() {
-            const filterValue = this.getAttribute('data-filter');
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
 
-            // Actualizar botones activos
-            projectFilters.forEach(btn => {
-                btn.classList.remove('bg-primary', 'text-white');
-                btn.classList.add('bg-gray-700', 'hover:bg-gray-600');
-            });
-            this.classList.add('bg-primary', 'text-white');
-            this.classList.remove('bg-gray-700', 'hover:bg-gray-600');
+    // Animación para los filtros
+    const filterButtons = document.querySelectorAll('a[href*="categoria="]');
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            // Agregar efecto de loading opcional
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
 
-            // Filtrar proyectos
-            projectCards.forEach(card => {
-                if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
+            setTimeout(() => {
+                this.innerHTML = originalText;
+            }, 1000);
+        });
+    });
+
+    // Smooth scroll para las secciones
+    function smoothScrollToSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    // Mostrar mensajes de estado
+    function showMessage(message, type = 'info') {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `fixed top-4 right-4 p-4 rounded-md z-50 ${
+            type === 'success' ? 'bg-green-500' :
+                type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+        } text-white`;
+        messageDiv.textContent = message;
+
+        document.body.appendChild(messageDiv);
+
+        setTimeout(() => {
+            messageDiv.remove();
+        }, 3000);
+    }
+
+    // Manejar clicks en enlaces deshabilitados
+    document.querySelectorAll('a.bg-gray-600').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            showMessage('Este perfil no está disponible temporalmente', 'error');
+        });
+    });
+
+    // Cargar más proyectos (para futura implementación de paginación)
+    function loadMoreProjects() {
+        // Aquí puedes implementar carga infinita cuando la tengas en el backend
+        console.log('Cargar más proyectos...');
+    }
+
+    // Intersection Observer para carga infinita (opcional)
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // loadMoreProjects(); // Descomentar cuando implementes paginación
                 }
             });
         });
-    });
 
-    // Filtros de talentos
-    const talentFilters = document.querySelectorAll('.talent-filter');
-    const talentCards = document.querySelectorAll('[data-skills]');
-
-    talentFilters.forEach(filter => {
-        filter.addEventListener('click', function() {
-            const filterValue = this.getAttribute('data-filter');
-
-            // Actualizar botones activos
-            talentFilters.forEach(btn => {
-                btn.classList.remove('bg-primary', 'text-white');
-                btn.classList.add('bg-gray-700', 'hover:bg-gray-600');
-            });
-            this.classList.add('bg-primary', 'text-white');
-            this.classList.remove('bg-gray-700', 'hover:bg-gray-600');
-
-            // Filtrar talentos
-            talentCards.forEach(card => {
-                if (filterValue === 'all' || card.getAttribute('data-skills').includes(filterValue)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-    });
-});
-// explore.js - Funcionalidad específica para la página de exploración
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Explore.js cargado correctamente');
-    initializeExploreTabs();
-    initializeProjectFilters();
-    initializeTalentFilters();
-});
-
-// Sistema de pestañas - VERSIÓN SIMPLIFICADA Y FUNCIONAL
-function initializeExploreTabs() {
-    const tabProyectos = document.getElementById('tab-proyectos');
-    const tabTalentos = document.getElementById('tab-talentos');
-    const proyectosSection = document.getElementById('proyectos-section');
-    const talentosSection = document.getElementById('talentos-section');
-
-    console.log('Inicializando pestañas:', { tabProyectos, tabTalentos, proyectosSection, talentosSection });
-
-    if (tabProyectos && tabTalentos) {
-        tabProyectos.addEventListener('click', function() {
-            console.log('Click en pestaña Proyectos');
-            switchTab('proyectos');
-        });
-
-        tabTalentos.addEventListener('click', function() {
-            console.log('Click en pestaña Talentos');
-            switchTab('talentos');
-        });
+        const sentinel = document.createElement('div');
+        sentinel.id = 'load-more-sentinel';
+        document.querySelector('.grid')?.appendChild(sentinel);
+        observer.observe(sentinel);
     }
-}
 
-function switchTab(tabName) {
-    const tabProyectos = document.getElementById('tab-proyectos');
-    const tabTalentos = document.getElementById('tab-talentos');
-    const proyectosSection = document.getElementById('proyectos-section');
-    const talentosSection = document.getElementById('talentos-section');
-
-    if (tabName === 'proyectos') {
-        // Activar pestaña proyectos
-        tabProyectos.classList.add('text-primary', 'border-primary');
-        tabProyectos.classList.remove('text-gray-400', 'border-transparent');
-        tabTalentos.classList.add('text-gray-400', 'border-transparent');
-        tabTalentos.classList.remove('text-primary', 'border-primary');
-
-        // Mostrar sección proyectos
-        if (proyectosSection) proyectosSection.classList.remove('hidden');
-        if (talentosSection) talentosSection.classList.add('hidden');
-
-    } else {
-        // Activar pestaña talentos
-        tabTalentos.classList.add('text-primary', 'border-primary');
-        tabTalentos.classList.remove('text-gray-400', 'border-transparent');
-        tabProyectos.classList.add('text-gray-400', 'border-transparent');
-        tabProyectos.classList.remove('text-primary', 'border-primary');
-
-        // Mostrar sección talentos
-        if (talentosSection) talentosSection.classList.remove('hidden');
-        if (proyectosSection) proyectosSection.classList.add('hidden');
-    }
-}
-
-// Filtros para proyectos - VERSIÓN SIMPLIFICADA
-function initializeProjectFilters() {
-    const filterButtons = document.querySelectorAll('.project-filter');
-    console.log('Botones de filtro proyectos encontrados:', filterButtons.length);
-
-    filterButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const filter = this.getAttribute('data-filter');
-            console.log('Filtrando proyectos por:', filter);
-            filterProjects(filter);
-
-            // Update active filter button
-            filterButtons.forEach(btn => {
-                btn.classList.remove('bg-primary', 'text-white');
-                btn.classList.add('bg-gray-700', 'text-white');
-            });
-            this.classList.add('bg-primary', 'text-white');
-            this.classList.remove('bg-gray-700');
-        });
-    });
-}
-
-function filterProjects(category) {
-    const projects = document.querySelectorAll('#proyectos-section [data-category]');
-    console.log('Proyectos encontrados:', projects.length);
-
-    projects.forEach(project => {
-        if (category === 'all' || project.getAttribute('data-category') === category) {
-            project.classList.remove('hidden');
-        } else {
-            project.classList.add('hidden');
-        }
-    });
-}
-
-// Filtros para talentos - VERSIÓN SIMPLIFICADA
-function initializeTalentFilters() {
-    const filterButtons = document.querySelectorAll('.talent-filter');
-    console.log('Botones de filtro talentos encontrados:', filterButtons.length);
-
-    filterButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const filter = this.getAttribute('data-filter');
-            console.log('Filtrando talentos por:', filter);
-            filterTalents(filter);
-
-            // Update active filter button
-            filterButtons.forEach(btn => {
-                btn.classList.remove('bg-primary', 'text-white');
-                btn.classList.add('bg-gray-700', 'text-white');
-            });
-            this.classList.add('bg-primary', 'text-white');
-            this.classList.remove('bg-gray-700');
-        });
-    });
-}
-
-function filterTalents(skill) {
-    const talents = document.querySelectorAll('#talentos-section [data-skills]');
-    console.log('Talentos encontrados:', talents.length);
-
-    talents.forEach(talent => {
-        const talentSkills = talent.getAttribute('data-skills');
-        if (skill === 'all' || talentSkills.includes(skill)) {
-            talent.classList.remove('hidden');
-        } else {
-            talent.classList.add('hidden');
-        }
-    });
-}
+    console.log('Hirelance Explore - JavaScript cargado correctamente');
+});

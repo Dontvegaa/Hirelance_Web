@@ -1,9 +1,12 @@
+-- ===============================================
+-- CREACIÓN DE BASE DE DATOS
+-- ===============================================
 CREATE DATABASE IF NOT EXISTS hirelance_db;
 USE hirelance_db;
 
--- ===========================
--- USUARIOS
--- ===========================
+-- ===============================================
+-- 1. USUARIOS
+-- ===============================================
 CREATE TABLE usuarios (
                           id_usuario INT AUTO_INCREMENT PRIMARY KEY,
                           nombre VARCHAR(100) NOT NULL,
@@ -12,14 +15,41 @@ CREATE TABLE usuarios (
                           contrasena VARCHAR(255) NOT NULL,
                           dui VARCHAR(10) NOT NULL COMMENT 'Documento Único de Identidad (formato NNNNNNNN-N)',
                           tipo ENUM('estudiante','contratista','admin'),
-                          telefono VARCHAR(20),
+                          telefono VARCHAR(14),
                           fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                           estado ENUM('activo','inactivo','baneado') DEFAULT 'activo'
 );
 
--- ===========================
--- PERFIL DE ESTUDIANTE
--- ===========================
+-- ===============================================
+-- 2. CATEGORÍAS DE SERVICIOS
+-- ===============================================
+CREATE TABLE categorias (
+                            id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+                            nombre VARCHAR(100) NOT NULL,
+                            descripcion TEXT
+);
+
+-- ===============================================
+-- 3. UNIVERSIDAD
+-- ===============================================
+CREATE TABLE universidad (
+                             id_universidad INT AUTO_INCREMENT PRIMARY KEY,
+                             nombre VARCHAR(150) NOT NULL UNIQUE,
+                             logo MEDIUMBLOB
+);
+
+-- ===============================================
+-- 4. HABILIDAD
+-- ===============================================
+CREATE TABLE habilidad (
+                           id_habilidad INT AUTO_INCREMENT PRIMARY KEY,
+                           titulo VARCHAR(100) NOT NULL UNIQUE,
+                           descripcion TEXT
+);
+
+-- ===============================================
+-- 5. PERFIL DE ESTUDIANTE
+-- ===============================================
 CREATE TABLE perfil_estudiante (
                                    id_perfil INT AUTO_INCREMENT PRIMARY KEY,
                                    id_usuario INT NOT NULL,
@@ -27,13 +57,13 @@ CREATE TABLE perfil_estudiante (
                                    anio_carrera INT,
                                    descripcion TEXT,
                                    portafolio_url VARCHAR(255),
-                                   foto_perfil VARCHAR(255),
+                                   foto_perfil MEDIUMBLOB,
                                    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
--- ===========================
--- PERFIL DE CONTRATISTA
--- ===========================
+-- ===============================================
+-- 6. PERFIL DE CONTRATISTA
+-- ===============================================
 CREATE TABLE perfil_contratista (
                                     id_perfil INT AUTO_INCREMENT PRIMARY KEY,
                                     id_usuario INT NOT NULL,
@@ -41,22 +71,13 @@ CREATE TABLE perfil_contratista (
                                     ubicacion VARCHAR(150),
                                     descripcion TEXT,
                                     sitio_web VARCHAR(255),
-                                    logo_empresa VARCHAR(255),
+                                    logo_empresa MEDIUMBLOB,
                                     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
--- ===========================
--- CATEGORÍAS DE SERVICIOS
--- ===========================
-CREATE TABLE categorias (
-                            id_categoria INT AUTO_INCREMENT PRIMARY KEY,
-                            nombre VARCHAR(100) NOT NULL,
-                            descripcion TEXT
-);
-
--- ===========================
--- PROYECTOS / SERVICIOS PUBLICADOS
--- ===========================
+-- ===============================================
+-- 7. PROYECTOS / SERVICIOS PUBLICADOS
+-- ===============================================
 CREATE TABLE proyectos (
                            id_proyecto INT AUTO_INCREMENT PRIMARY KEY,
                            id_contratista INT NOT NULL,
@@ -71,9 +92,9 @@ CREATE TABLE proyectos (
                            FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
 );
 
--- ===========================
--- POSTULACIONES DE ESTUDIANTES
--- ===========================
+-- ===============================================
+-- 8. POSTULACIONES DE ESTUDIANTES
+-- ===============================================
 CREATE TABLE postulaciones (
                                id_postulacion INT AUTO_INCREMENT PRIMARY KEY,
                                id_proyecto INT NOT NULL,
@@ -87,9 +108,9 @@ CREATE TABLE postulaciones (
                                FOREIGN KEY (id_estudiante) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
--- ===========================
--- CONTRATOS ENTRE CONTRATISTA Y ESTUDIANTE
--- ===========================
+-- ===============================================
+-- 9. CONTRATOS ENTRE CONTRATISTA Y ESTUDIANTE
+-- ===============================================
 CREATE TABLE contratos (
                            id_contrato INT AUTO_INCREMENT PRIMARY KEY,
                            id_proyecto INT NOT NULL,
@@ -104,9 +125,9 @@ CREATE TABLE contratos (
                            FOREIGN KEY (id_contratista) REFERENCES usuarios(id_usuario)
 );
 
--- ===========================
--- MENSAJES / CHAT ENTRE USUARIOS
--- ===========================
+-- ===============================================
+-- 10. MENSAJES / CHAT ENTRE USUARIOS
+-- ===============================================
 CREATE TABLE mensajes (
                           id_mensaje INT AUTO_INCREMENT PRIMARY KEY,
                           id_emisor INT NOT NULL,
@@ -120,9 +141,9 @@ CREATE TABLE mensajes (
                           FOREIGN KEY (id_proyecto) REFERENCES proyectos(id_proyecto)
 );
 
--- ===========================
--- VALORACIONES Y RESEÑAS
--- ===========================
+-- ===============================================
+-- 11. VALORACIONES Y RESEÑAS
+-- ===============================================
 CREATE TABLE valoraciones (
                               id_valoracion INT AUTO_INCREMENT PRIMARY KEY,
                               id_emisor INT NOT NULL,
@@ -136,9 +157,9 @@ CREATE TABLE valoraciones (
                               FOREIGN KEY (id_proyecto) REFERENCES proyectos(id_proyecto)
 );
 
--- ===========================
--- SISTEMA DE NOTIFICACIONES
--- ===========================
+-- ===============================================
+-- 12. SISTEMA DE NOTIFICACIONES
+-- ===============================================
 CREATE TABLE notificaciones (
                                 id_notificacion INT AUTO_INCREMENT PRIMARY KEY,
                                 id_usuario INT NOT NULL,
@@ -149,9 +170,9 @@ CREATE TABLE notificaciones (
                                 FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 );
 
--- ===========================
--- UBICACIONES (CIUDAD / DEPARTAMENTO / PAÍS)
--- ===========================
+-- ===============================================
+-- 13. UBICACIONES (CIUDAD / DEPARTAMENTO / PAÍS)
+-- ===============================================
 CREATE TABLE ubicaciones (
                              id_ubicacion INT AUTO_INCREMENT PRIMARY KEY,
                              id_usuario INT NOT NULL,
@@ -161,9 +182,9 @@ CREATE TABLE ubicaciones (
                              FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
 );
 
--- ===========================
--- REPORTES / SOPORTE TÉCNICO
--- ===========================
+-- ===============================================
+-- 14. REPORTES / SOPORTE TÉCNICO
+-- ===============================================
 CREATE TABLE reportes (
                           id_reporte INT AUTO_INCREMENT PRIMARY KEY,
                           id_usuario INT NOT NULL,
@@ -174,27 +195,8 @@ CREATE TABLE reportes (
                           FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 );
 
-
 -- ===============================================
--- NUEVA TABLA: UNIVERSIDAD (MAESTRA)
--- ===============================================
-CREATE TABLE universidad (
-                             id_universidad INT AUTO_INCREMENT PRIMARY KEY,
-                             nombre VARCHAR(150) NOT NULL UNIQUE,
-                             logo VARCHAR(255) COMMENT 'URL o path al logo'
-);
-
--- ===============================================
--- NUEVA TABLA: HABILIDAD (MAESTRA)
--- ===============================================
-CREATE TABLE habilidad (
-                           id_habilidad INT AUTO_INCREMENT PRIMARY KEY,
-                           titulo VARCHAR(100) NOT NULL UNIQUE,
-                           descripcion TEXT
-);
-
--- ===============================================
--- NUEVA TABLA: RELACIÓN ESTUDIANTE <-> UNIVERSIDAD (N-M)
+-- 15. RELACIÓN ESTUDIANTE <-> UNIVERSIDAD (N-M)
 -- ===============================================
 CREATE TABLE estudiante_universidad (
                                         id_usuario INT NOT NULL,
@@ -205,7 +207,7 @@ CREATE TABLE estudiante_universidad (
 );
 
 -- ===============================================
--- NUEVA TABLA: RELACIÓN ESTUDIANTE <-> HABILIDAD (N-M)
+-- 16. RELACIÓN ESTUDIANTE <-> HABILIDAD (N-M)
 -- ===============================================
 CREATE TABLE habilidad_estudiante (
                                       id_usuario INT NOT NULL,

@@ -2,6 +2,10 @@ package com.example.Hirelance.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -19,5 +23,11 @@ public class Habilidad {
 
     // Esta línea es la que buscaba el campo "habilidades" en Usuario.java
     @ManyToMany(mappedBy = "habilidades", fetch = FetchType.LAZY)
-    private Set<Usuario> usuarios;
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Usuario> usuarios = new HashSet<>();
+
+
+
+
 }

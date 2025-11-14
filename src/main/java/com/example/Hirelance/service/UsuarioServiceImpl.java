@@ -23,8 +23,6 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Autowired
     private PerfilContratistaRepository perfilContratistaRepository;
 
-    @Autowired
-    private StorageService storageService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -36,6 +34,10 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Autowired
     private UniversidadRepository universidadRepository;
 
+    // ¡NUEVO! Inyectar el repositorio de Ubicacion
+    @Autowired
+    private UbicacionRepository ubicacionRepository;
+
     @Override
     @Transactional
     public void registrarEstudiante(RegisterDTO registerDTO, MultipartFile fotoPerfil) throws Exception {
@@ -44,7 +46,6 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new Exception("El correo electrónico ya está en uso.");
         }
 
-        String nombreArchivoFoto = storageService.store(fotoPerfil);
 
         Usuario usuario = new Usuario();
         usuario.setNombre(registerDTO.getNombre());
@@ -96,7 +97,9 @@ public class UsuarioServiceImpl implements UsuarioService {
         perfil.setAnioCarrera(registerDTO.getAnioCarrera());
         perfil.setDescripcion(registerDTO.getDescripcion());
         perfil.setPortafolioUrl(registerDTO.getPortafolioUrl());
-        perfil.setFotoPerfil(nombreArchivoFoto);
+        if (fotoPerfil != null && !fotoPerfil.isEmpty()) {
+            perfil.setFotoPerfil(fotoPerfil.getBytes());
+        }
 
         perfilEstudianteRepository.save(perfil);
     }
@@ -104,11 +107,12 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     @Transactional
     public void registrarContratista(RegisterDTO registerDTO, MultipartFile logoEmpresa) throws Exception {
-        // ... (Este método no cambia)
+
         if (usuarioRepository.findByCorreo(registerDTO.getCorreo()).isPresent()) {
             throw new Exception("El correo electrónico ya está en uso.");
         }
-        String nombreArchivoLogo = storageService.store(logoEmpresa);
+
+
         Usuario usuario = new Usuario();
         usuario.setNombre(registerDTO.getNombre());
         usuario.setApellido(registerDTO.getApellido());
@@ -118,15 +122,47 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setTelefono(registerDTO.getTelefono());
         usuario.setTipo(Usuario.TipoUsuario.contratista);
         usuario.setEstado(Usuario.EstadoUsuario.activo);
+
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
+
+        // --- INICIO DE LA SOLUCIÓN ---
+
+        String ciudad = null;
+        String departamento = null;
+
+        // 1. Separar la cadena "Ciudad, Departamento"
+        if (registerDTO.getUbicacion() != null && !registerDTO.getUbicacion().isEmpty()) {
+            String[] partes = registerDTO.getUbicacion().split(", ");
+            if (partes.length == 2) {
+                ciudad = partes[0];
+                departamento = partes[1];
+            } else {
+                // Si algo falla, al menos guarda el departamento (para filtros)
+                departamento = registerDTO.getUbicacion();
+            }
+        }
+
+        // 2. Guardar en PerfilContratista (solo el departamento)
         PerfilContratista perfil = new PerfilContratista();
         perfil.setUsuario(usuarioGuardado);
         perfil.setEmpresa(registerDTO.getEmpresa());
-        perfil.setUbicacion(registerDTO.getUbicacion());
+        perfil.setUbicacion(departamento); // Guardamos solo el departamento para los filtros
         perfil.setDescripcion(registerDTO.getDescripcion());
         perfil.setSitioWeb(registerDTO.getSitioWeb());
-        perfil.setLogoEmpresa(nombreArchivoLogo);
+        if (logoEmpresa != null && !logoEmpresa.isEmpty()) {
+            perfil.setLogoEmpresa(logoEmpresa.getBytes());
+        }
 
         perfilContratistaRepository.save(perfil);
+
+        // 3. Guardar en la tabla Ubicaciones (el detalle)
+        // (Asegúrate de haber inyectado UbicacionRepository como te indiqué antes)
+        Ubicacion ubicacionDetallada = new Ubicacion();
+        ubicacionDetallada.setUsuario(usuarioGuardado);
+        ubicacionDetallada.setDepartamento(departamento);
+        ubicacionDetallada.setCiudad(ciudad);
+
+        ubicacionRepository.save(ubicacionDetallada);
+        // --- FIN DE LA SOLUCIÓN ---
     }
 }

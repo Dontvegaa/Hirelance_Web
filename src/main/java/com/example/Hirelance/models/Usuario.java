@@ -2,6 +2,9 @@ package com.example.Hirelance.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,7 +27,10 @@ public class Usuario {
 
     private String contrasena;  // ✅ Mantén este
 
+    @Column(name = "dui", length = 10)
     private String dui;
+
+    @Column(name = "telefono", length = 14)
     private String telefono;
 
     @Enumerated(EnumType.STRING)
@@ -36,13 +42,24 @@ public class Usuario {
     @Column(name = "fecha_registro", columnDefinition = "TIMESTAMP")
     private LocalDateTime fechaRegistro;
 
-    // Relación uno a uno con PerfilEstudiante
-    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    // Relación uno a uno con PerfilEstudiante - EVITA RECURSIÓN
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private PerfilEstudiante perfilEstudiante;
 
-    // Relación uno a uno con PerfilContratista
-    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    // Relación uno a uno con PerfilContratista - EVITA RECURSIÓN
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private PerfilContratista perfilContratista;
+
+    // Relación con Ubicaciones (NUEVO)
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Ubicacion> ubicaciones = new HashSet<>();
+
 
     // --- Relación con Habilidad (La que ya tenías) ---
     @ManyToMany(fetch = FetchType.LAZY, cascade = {
@@ -54,6 +71,8 @@ public class Usuario {
             joinColumns = { @JoinColumn(name = "id_usuario") }, // FK a esta entidad (Usuario)
             inverseJoinColumns = { @JoinColumn(name = "id_habilidad") } // FK a la otra entidad (Habilidad)
     )
+    @ToString.Exclude // <-- AÑADIR
+    @EqualsAndHashCode.Exclude // <-- AÑADIR
     private Set<Habilidad> habilidades = new HashSet<>();
 
     // ==========================================================
@@ -68,10 +87,13 @@ public class Usuario {
             joinColumns = { @JoinColumn(name = "id_usuario") }, // FK a esta entidad (Usuario)
             inverseJoinColumns = { @JoinColumn(name = "id_universidad") } // FK a la otra entidad (Universidad)
     )
+    @ToString.Exclude // <-- AÑADIR
+    @EqualsAndHashCode.Exclude // <-- AÑADIR
     private Set<Universidad> universidades = new HashSet<>();
     // ==========================================================
     // FIN DE LA SECCIÓN
     // ==========================================================
+
 
 
     @PrePersist

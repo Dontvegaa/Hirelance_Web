@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Proyecto - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-black text-white flex">
+
+<aside th:insert="~{admin/manage-projects :: aside}"></aside>
+
+<main class="flex-1 overflow-y-auto">
+    <header class="bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center">
+        <div>
+            <a th:href="@{/admin/manage-projects}" class="text-sm text-orange-500 hover:underline">
+                &larr; Volver a Gestionar Proyectos
+            </a>
+            <h1 class="text-2xl font-bold" th:text="${proyecto.titulo}">Detalle de Proyecto</h1>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition">Cerrar Sesión</button>
+        </form>
+    </header>
+
+    <div class="p-8">
+        <div class="max-w-4xl mx-auto">
+
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <p class="text-sm text-gray-400">Título</p>
+                        <p class="text-lg font-medium" th:text="${proyecto.titulo}"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400">Contratista</p>
+                        <p class="text-lg font-medium" th:text="${proyecto.contratista.nombre} + ' ' + ${proyecto.contratista.apellido}"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400">Categoría</p>
+                        <p class="text-lg font-medium" th:text="${proyecto.categoria.nombre}"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400">Presupuesto</p>
+                        <p class="text-lg font-medium text-orange-500" th:text="'$' + ${#numbers.formatDecimal(proyecto.presupuesto, 1, 2)}"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400">Estado</p>
+                        <span th:text="${proyecto.estado.name()}"
+                              th:classappend="${proyecto.estado.name() == 'publicado'} ? 'bg-green-700 text-green-300' : 'bg-red-700 text-red-300'"
+                              class="px-2 py-1 inline-flex text-sm leading-5 font-semibold rounded-full capitalize">
+                            </span>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400">Fecha Límite</p>
+                        <p class="text-lg font-medium" th:text="${#temporals.format(proyecto.fechaLimite, 'dd-MM-yyyy')}"></p>
+                    </div>
+                    <div class="md:col-span-3">
+                        <p class="text-sm text-gray-400">Descripción</p>
+                        <p class="text-gray-300" th:text="${proyecto.descripcion}"></p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-xl font-bold mb-4">Postulaciones Recibidas</h2>
+            <div class="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-800">
+                    <thead class="bg-gray-800">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Estudiante</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Propuesta</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Estado</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-800">
+                    <tr th:each="post : ${postulaciones}">
+                        <td class="px-6 py-4" th:text="${post.estudiante.nombre} + ' ' + ${post.estudiante.apellido}"></td>
+                        <td class="px-6 py-4 text-orange-500" th:text="'$' + ${#numbers.formatDecimal(post.presupuestoPropuesto, 1, 2)}"></td>
+                        <td class="px-6 py-4">
+                                    <span th:text="${post.estado.name()}"
+                                          th:classappend="${post.estado.name() == 'aceptada'} ? 'bg-green-700 text-green-300' :
+                                                         (${post.estado.name() == 'pendiente'} ? 'bg-yellow-700 text-yellow-300' : 'bg-red-700 text-red-300')"
+                                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize"></span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(postulaciones)}">
+                        <td colspan="3" class="px-6 py-12 text-center text-gray-500">
+                            Este proyecto no ha recibido postulaciones.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

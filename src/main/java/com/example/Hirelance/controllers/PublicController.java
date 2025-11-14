@@ -1,6 +1,8 @@
 package com.example.Hirelance.controllers;
 
 import com.example.Hirelance.dto.RegisterDTO;
+import com.example.Hirelance.models.*;
+import com.example.Hirelance.repository.*;
 import com.example.Hirelance.service.UsuarioService; // Importar el servicio
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -8,9 +10,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+
+import java.util.Base64;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class PublicController {
@@ -19,20 +24,121 @@ public class PublicController {
     @Autowired
     private UsuarioService usuarioService;
 
+    // ¡NUEVO: Inyectar el repositorio de categorías!
+    @Autowired
+    private CategoriaRepository categoriaRepository;
+
     // ... (tus otros métodos GET como welcome, explore, login, etc.) ...
 
     @GetMapping("/")
-    public String welcome() {
+    public String welcome(Model model) {
+        // Cargar categorías desde la base de datos
+        List<Categoria> categorias = categoriaRepository.findAll();
+        model.addAttribute("categorias", categorias);
         return "public/welcome";
     }
 
     @GetMapping("/welcome")
-    public String welcomePage() {
+    public String welcomePage(Model model) {
+        // Cargar categorías desde la base de datos
+        List<Categoria> categorias = categoriaRepository.findAll();
+        model.addAttribute("categorias", categorias);
         return "public/welcome";
     }
+    @Autowired
+    private PostulacionRepository postulacionRepository;
+
+    @Autowired
+    private HabilidadRepository habilidadRepository;
 
     @GetMapping("/explore")
-    public String explore() {
+    public String explore(
+            @RequestParam(defaultValue = "proyectos") String tab,
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false) String habilidad,
+            @RequestParam(required = false) String ubicacion, // ¡NUEVO!
+            @RequestParam(required = false) String busqueda,
+            Model model) {
+
+        // Cargar categorías (para pestaña proyectos)
+        List<Categoria> categorias = categoriaRepository.findAll();
+        model.addAttribute("categorias", categorias);
+
+        // ¡NUEVO! Cargar habilidades (para pestaña estudiantes)
+        List<Habilidad> habilidades = habilidadRepository.findAll();
+        model.addAttribute("habilidades", habilidades);
+
+        Map<String, List<String>> locationData = getDepartamentosMunicipios();
+        model.addAttribute("departamentos", locationData.keySet());
+
+        model.addAttribute("tabActivo", tab);
+        model.addAttribute("categoriaSeleccionada", categoria != null ? categoria : "all");
+        model.addAttribute("habilidadSeleccionada", habilidad != null ? habilidad : "all"); // ¡NUEVO!
+        model.addAttribute("ubicacionSeleccionada", ubicacion != null ? ubicacion : "all");
+        model.addAttribute("busqueda", busqueda);
+
+        if ("proyectos".equals(tab)) {
+            List<Proyecto> proyectos;
+            if (busqueda != null && !busqueda.trim().isEmpty()) {
+                proyectos = proyectoRepository.buscarPorTituloODescripcion(busqueda);
+            } else if (categoria != null && !categoria.equals("all")) {
+                proyectos = proyectoRepository.buscarPorCategoria(categoria);
+            } else {
+                proyectos = proyectoRepository.findAllWithContratista();
+            }
+            model.addAttribute("proyectos", proyectos);
+
+        } else if ("estudiantes".equals(tab)) {
+            List<Usuario> estudiantes;
+            if (busqueda != null && !busqueda.trim().isEmpty()) {
+                estudiantes = usuarioRepository.findEstudiantesWithProfileBySearch(busqueda);
+            } else if (habilidad != null && !habilidad.equals("all")) {
+                estudiantes = usuarioRepository.findEstudiantesByHabilidad(habilidad);
+            } else {
+                estudiantes = usuarioRepository.findAllEstudiantesWithProfile();
+            }
+
+            // --- INICIO DE LA SOLUCIÓN ---
+            // Convertir los datos de byte[] a Base64 String aquí
+            List<Map<String, Object>> estudiantesVM = new ArrayList<>();
+            for (Usuario u : estudiantes) {
+                Map<String, Object> vm = new HashMap<>();
+                vm.put("usuario", u); // Contiene el objeto Usuario completo
+                String base64Img = null;
+                if (u.getPerfilEstudiante() != null && u.getPerfilEstudiante().getFotoPerfil() != null) {
+                    base64Img = Base64.getEncoder().encodeToString(u.getPerfilEstudiante().getFotoPerfil());
+                }
+                vm.put("base64Image", base64Img); // Contiene la imagen como String
+                estudiantesVM.add(vm);
+            }
+            model.addAttribute("estudiantes", estudiantesVM); // Pasamos la nueva lista
+
+        } else if ("contratistas".equals(tab)) {
+            List<Usuario> contratistas;
+            if (busqueda != null && !busqueda.trim().isEmpty()) {
+                contratistas = usuarioRepository.findContratistasWithProfileBySearch(busqueda);
+            } else if (ubicacion != null && !ubicacion.equals("all")) {
+                contratistas = usuarioRepository.findContratistasByUbicacion(ubicacion);
+            } else {
+                contratistas = usuarioRepository.findAllContratistasWithProfile();
+            }
+
+            // --- INICIO DE LA SOLUCIÓN ---
+            // Convertir los datos de byte[] a Base64 String aquí
+            List<Map<String, Object>> contratistasVM = new ArrayList<>();
+            for (Usuario u : contratistas) {
+                Map<String, Object> vm = new HashMap<>();
+                vm.put("contratista", u); // Contiene el objeto Usuario completo
+                String base64Img = null;
+                if (u.getPerfilContratista() != null && u.getPerfilContratista().getLogoEmpresa() != null) {
+                    base64Img = Base64.getEncoder().encodeToString(u.getPerfilContratista().getLogoEmpresa());
+                }
+                vm.put("base64Image", base64Img); // Contiene la imagen como String
+                contratistasVM.add(vm);
+            }
+            model.addAttribute("contratistas", contratistasVM); // Pasamos la nueva lista
+            // --- FIN DE LA SOLUCIÓN ---
+        }
         return "public/explore";
     }
 
@@ -148,6 +254,13 @@ public class PublicController {
         return "public/public-profile-contratista";
     }
 
+    @GetMapping("/how-it-works")
+    public String howItWorks() {
+        // Esto le dice a Spring Boot que busque "how-it-works.html"
+        // dentro de la carpeta "templates/public/"
+        return "public/how-it-works";
+    }
+
     private Map<String, List<String>> getDepartamentosMunicipios() {
         // Usamos TreeMap para que los departamentos estén ordenados alfabéticamente
         Map<String, List<String>> data = new TreeMap<>();
@@ -167,6 +280,13 @@ public class PublicController {
         data.put("Usulután", List.of("Alegría", "Berlín", "California", "Concepción Batres", "El Triunfo", "Ereguayquín", "Estanzuelas", "Jiquilisco", "Jucuapa", "Jucuarán", "Mercedes Umaña", "Nueva Granada", "Ozatlán", "Puerto El Triunfo", "San Agustín", "San Buenaventura", "San Dionisio", "San Francisco Javier", "San Jorge", "Santa Elena", "Santa María", "Santiago de María", "Tecapán", "Usulután"));
         return data;
     }
+    // Agrega estas inyecciones al PublicController
+    @Autowired
+    private ProyectoRepository proyectoRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
 }
 
 

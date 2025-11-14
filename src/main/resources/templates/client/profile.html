@@ -1,10 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-black text-white flex">
+
+<aside class="w-64 min-h-screen bg-gray-900 border-r border-gray-800 p-6">
+    <a href="/client/dashboard" class="text-2xl font-bold text-orange-500">Hirelance</a>
+    <nav class="mt-10">
+        <a href="/client/dashboard" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tachometer-alt w-6 mr-2"></i> Dashboard
+        </a>
+        <a href="/client/post-project" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-plus w-6 mr-2"></i> Publicar Proyecto
+        </a>
+        <a href="/client/my-projects" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tasks w-6 mr-2"></i> Mis Proyectos
+        </a>
+        <a href="/client/search-freelancer" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-search w-6 mr-2"></i> Buscar Talento
+        </a>
+        <a href="/client/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
+        </a>
+        <a href="/client/profile" class="block py-2 px-4 bg-orange-500 text-white rounded">
+            <i class="fas fa-user w-6 mr-2"></i> Mi Perfil
+        </a>
+        <a href="/client/settings" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-cog w-6 mr-2"></i> Ajustes
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1">
+
+    <div class="p-8">
+        <div class="max-w-4xl mx-auto bg-gray-900 rounded-lg border border-gray-800 overflow-hidden">
+            <div class="p-8 border-b border-gray-800">
+                <div class="flex justify-between items-center p-6 border-b border-gray-800">
+                    <h1 class="text-xl font-bold">Mi Perfil de Contratista</h1>
+                    <a th:href="@{/client/settings}" class="text-gray-400 hover:text-orange-500 transition">
+                        <i class="fas fa-cog text-xl"></i>
+                    </a>
+                </div>
+                <div class="flex flex-col md:flex-row items-center">
+                    <div class="w-32 h-32 bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700 mb-4 md:mb-0">
+                        <img th:if="${currentLogo != null}" th:src="'data:image/jpeg;base64,' + ${currentLogo}" alt="Logo" class="w-full h-full object-cover rounded-lg">
+                        <i th:if="${currentLogo == null}" class="fas fa-building text-5xl text-gray-500"></i>
+                    </div>
+
+                    <div class="md:ml-8 text-center md:text-left">
+                        <h2 class="text-3xl font-bold" th:text="${perfil?.empresa} ?: 'Nombre de Empresa no'">Nombre Empresa</h2>
+                        <p class="text-lg text-gray-400" th:text="${usuario.nombre} + ' ' + ${usuario.apellido}">Nombre del Reclutador</p>
+
+                        <div th:if="${ubicacion != null}" class="text-orange-500 mt-2">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span th:text="${ubicacion.ciudad} + ', ' + ${ubicacion.departamento}"></span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-8">
+                <h3 class="text-xl font-bold mb-4">Acerca de la Empresa</h3>
+                <p class_="text-gray-300 mb-6" th:text="${perfil?.descripcion} ?: 'No hay descripción disponible.'">
+                    Descripción de la empresa...
+                </p>
+
+                <hr class="border-gray-800 my-6">
+
+                <h3 class="text-xl font-bold mb-4">Información de Contacto</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <p class="text-sm text-gray-400">Correo Electrónico</p>
+                        <p class="font-medium" th:text="${usuario.correo}">correo@empresa.com</p>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <p class="text-sm text-gray-400">Teléfono</p>
+                        <p class="font-medium" th:text="${usuario.telefono}">+503 XXXX-XXXX</p>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <p class="text-sm text-gray-400">Sitio Web</p>
+                        <a th:if="${perfil?.sitioWeb}" th:href="${perfil.sitioWeb}" target="_blank" class="font-medium text-orange-500 hover:underline" th:text="${perfil.sitioWeb}">
+                            https://empresa.com
+                        </a>
+                        <p th:if="${perfil?.sitioWeb == null}" class="font-medium text-gray-500">No disponible</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
 
 </body>
 </html>

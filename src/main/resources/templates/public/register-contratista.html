@@ -111,12 +111,22 @@
 
             <div class="mb-6">
                 <label for="telefono" class="block text-sm font-medium mb-2">Teléfono</label>
-                <input type="tel" id="telefono" th:field="*{telefono}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="+503 XXXX-XXXX">
+                <input type="tel"
+                       id="telefono"
+                       th:field="*{telefono}"
+                       class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                       placeholder="+503 6059-8569"
+                       required>
             </div>
 
             <div class="mb-6">
                 <label for="dui" class="block text-sm font-medium mb-2">DUI</label>
-                <input type="text" id="dui" th:field="*{dui}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="NNNNNNNN-N">
+                <input type="text"
+                       id="dui"
+                       th:field="*{dui}"
+                       class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                       placeholder="06804213-9"
+                       required>
             </div>
 
             <div class="border-t border-gray-700 pt-6 mb-6">
