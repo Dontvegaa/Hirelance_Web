@@ -1,0 +1,42 @@
+# Archivos de control de versiones
+.git
+.gitignore
+.gitattributes
+
+# Archivos de IDE
+.idea
+.vscode
+*.iml
+*.ipr
+*.iws
+
+# Archivos de compilación
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de documentación
+README.md
+HELP.md
+*.md
+
+# Archivos de Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Archivos de logs
+*.log
+
+# Archivos temporales
+*.tmp
+*.bak
+*.swp
+*~
+
+# Archivos de uploads locales (se regenerarán en el contenedor)
+uploads/
+downloads/
