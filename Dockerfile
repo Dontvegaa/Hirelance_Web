@@ -33,8 +33,8 @@ WORKDIR /app
 # Usamos un comodín (*.war) para que coincida con "Hirelance-0.0.1-SNAPSHOT.war"
 COPY --from=builder /app/target/*.war app.war
 
-# Exponemos el puerto estándar 8000 de Spring Boot
-EXPOSE 8000
+# Exponemos el puerto - puede ser sobrescrito con variables de entorno
+EXPOSE ${PORT:-8000}
 
 # El comando que se ejecutará cuando inicie el contenedor
 # (Spring Boot permite ejecutar .war empaquetados de esta forma)
