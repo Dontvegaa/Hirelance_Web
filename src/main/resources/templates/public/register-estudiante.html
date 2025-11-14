@@ -21,27 +21,60 @@
     </script>
 </head>
 <body class="bg-secondary text-white">
+<!-- Header Responsive -->
+<!-- Header Responsive -->
 <header class="bg-secondary border-b border-gray-800">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
         <div class="flex items-center">
-            <a href="/" class="text-2xl font-bold text-primary"><img th:src="@{/img/Hirelance-Logo-grupo19.png.png}" class="h-24 w-29 " alt="Hirelance Logo"></a>
+            <a href="/" class="text-2xl font-bold text-primary">
+                <img th:src="@{/img/Hirelance-Logo-grupo19.png.png}" class="h-16 md:h-24 w-auto" alt="Hirelance Logo">
+            </a>
         </div>
-        <div class="flex items-center space-x-4">
+
+        <!-- Menú hamburguesa para móvil -->
+        <div class="md:hidden">
+            <button id="menu-btn" class="text-white focus:outline-none">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Navegación desktop -->
+        <nav class="hidden md:flex space-x-6">
+            <a href="/" class="hover:text-primary transition">Inicio</a>
+            <a href="/explore" class="hover:text-primary transition">Explorar</a>
+            <a href="/how-it-works" class="hover:text-primary transition">Cómo funciona</a>
+        </nav>
+
+        <div class="hidden md:flex items-center space-x-4">
             <a href="/login" class="hover:text-primary transition">Iniciar Sesión</a>
             <a href="/register" class="bg-primary hover:bg-orange-600 text-white px-4 py-2 rounded-md transition">Registrarse</a>
         </div>
     </div>
+
+    <!-- Menú móvil -->
+    <div id="mobile-menu" class="md:hidden hidden bg-accent border-t border-gray-800">
+        <div class="container mx-auto px-4 py-4 space-y-4">
+            <a href="/" class="block hover:text-primary transition">Inicio</a>
+            <a href="/explore" class="block hover:text-primary transition">Explorar</a>
+            <a href="/how-it-works" class="block hover:text-primary transition">Cómo funciona</a>
+            <div class="pt-4 border-t border-gray-700 space-y-3">
+                <a href="/login" class="block hover:text-primary transition">Iniciar Sesión</a>
+                <a href="/register" class="block bg-primary hover:bg-orange-600 text-white px-4 py-3 rounded-md text-center transition">Registrarse</a>
+            </div>
+        </div>
+    </div>
 </header>
 
-<section class="min-h-screen flex items-center justify-center py-12 px-4">
-    <div class="max-w-2xl w-full bg-accent p-8 rounded-lg border border-gray-800">
-        <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold">Registro para Estudiantes</h2>
+<!-- Formulario Responsive -->
+<section class="min-h-screen flex items-center justify-center py-8 px-4">
+    <div class="max-w-2xl w-full bg-accent p-6 md:p-8 rounded-lg border border-gray-800">
+        <div class="text-center mb-6 md:mb-8">
+            <h2 class="text-2xl md:text-3xl font-bold">Registro para Estudiantes</h2>
             <p class="text-gray-400 mt-2">Crea tu perfil para encontrar proyectos freelance</p>
         </div>
 
         <form action="/register-estudiante" th:object="${registerDTO}" method="POST" enctype="multipart/form-data">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
                 <div>
                     <label for="nombre" class="block text-sm font-medium mb-2">Nombre</label>
                     <input type="text" id="nombre" th:field="*{nombre}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Tu nombre" required>
@@ -51,6 +84,7 @@
                     <input type="text" id="apellido" th:field="*{apellido}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Tu apellido" required>
                 </div>
             </div>
+
             <div class="mb-6">
                 <label for="email" class="block text-sm font-medium mb-2">Correo Electronico</label>
                 <input type="email" id="email" th:field="*{correo}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="example@correo.com" required>
@@ -60,6 +94,7 @@
                 <label for="password" class="block text-sm font-medium mb-2">Contraseña</label>
                 <input type="password" id="password" th:field="*{contrasena}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="••••••••" required>
             </div>
+
             <div class="mb-6">
                 <label for="password-confirm" class="block text-sm font-medium mb-2">Confirmar Contraseña</label>
                 <input type="password" id="password-confirm" name="password-confirm" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="••••••••" required>
@@ -104,6 +139,7 @@
                        placeholder="+503 6059-8569"
                        required>
             </div>
+
             <div class="mb-6">
                 <label for="dui" class="block text-sm font-medium mb-2">DUI</label>
                 <input type="text"
@@ -113,10 +149,11 @@
                        placeholder="06804213-9"
                        required>
             </div>
-            <!-- Cambia estos campos en la sección de Información Académica -->
+
+            <!-- Información Académica Responsive -->
             <div class="border-t border-gray-700 pt-6 mb-6">
                 <h3 class="text-xl font-bold mb-4">Información Académica</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div>
                         <label for="universidad" class="block text-sm font-medium mb-2">Universidad</label>
                         <input type="text" id="universidad" th:field="*{universidad}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Nombre de tu universidad">
@@ -138,19 +175,23 @@
                     </select>
                 </div>
             </div>
+
             <div class="mb-6">
                 <label for="habilidades" class="block text-sm font-medium mb-2">Habilidades</label>
                 <textarea id="habilidades" th:field="*{habilidades}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" rows="3" placeholder="Ej: Diseño UI/UX, Desarrollo Web, Python, JavaScript..."></textarea>
                 <p class="text-sm text-gray-400 mt-1">Separa tus habilidades con comas</p>
             </div>
+
             <div class="mb-6">
                 <label for="descripcion" class="block text-sm font-medium mb-2">Descripción Personal</label>
                 <textarea id="descripcion" th:field="*{descripcion}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" rows="4" placeholder="Cuéntanos sobre ti, tus intereses y experiencia..."></textarea>
             </div>
+
             <div class="mb-6">
                 <label for="portafolio" class="block text-sm font-medium mb-2">URL de Portafolio</label>
                 <input type="url" id="portafolio" th:field="*{portafolioUrl}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="https://tuportafolio.com">
             </div>
+
             <div class="mb-6">
                 <label for="foto_perfil" class="block text-sm font-medium mb-2">Foto de Perfil</label>
                 <input type="file" id="foto_perfil" name="foto_perfil" class="w-full px-3 py-2 bg-secondary border border-gray-700 rounded-md text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-orange-600">
@@ -181,5 +222,33 @@
 
 <script th:src="@{/js/register-validation.js}"></script>
 
+<!-- Script del Menú Móvil -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Cerrar menú al hacer clic en un enlace
+            const mobileLinks = mobileMenu.querySelectorAll('a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // Cerrar menú al hacer clic fuera de él
+            document.addEventListener('click', function(event) {
+                if (!menuBtn.contains(event.target) && !mobileMenu.contains(event.target)) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        }
+    });
+</script>
 </body>
 </html>

@@ -21,38 +21,66 @@
     </script>
 </head>
 <body class="bg-secondary text-white">
+<!-- Header Responsive Mejorado -->
 <header class="bg-secondary border-b border-gray-800">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
         <div class="flex items-center">
-            <a href="/welcome" class="text-2xl font-bold text-primary"><img th:src="@{/img/Hirelance-Logo-grupo19.png.png}"  class="h-24 w-29 " alt="Hirelance Logo"></a>
+            <a href="/welcome" class="text-2xl font-bold text-primary">
+                <img th:src="@{/img/Hirelance-Logo-grupo19.png.png}" class="h-16 md:h-24 w-auto" alt="Hirelance Logo">
+            </a>
         </div>
+
+        <!-- Menú hamburguesa para móvil -->
+        <div class="md:hidden">
+            <button id="menu-btn" class="text-white focus:outline-none">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Navegación desktop -->
         <nav class="hidden md:flex space-x-6">
-            <a href="/welcome." class="text-primary font-medium">Inicio</a>
+            <a href="/welcome" class="text-primary font-medium">Inicio</a>
             <a href="/explore" class="hover:text-primary transition">Explorar</a>
             <a href="/how-it-works" class="hover:text-orange-500 transition">Cómo funciona</a>
         </nav>
-        <div class="flex items-center space-x-4">
+
+        <div class="hidden md:flex items-center space-x-4">
             <a href="/login" class="hover:text-primary transition">Iniciar Sesión</a>
             <a href="/register" class="bg-primary hover:bg-orange-600 text-white px-4 py-2 rounded-md transition">Registrarse</a>
         </div>
     </div>
+
+    <!-- Menú móvil -->
+    <div id="mobile-menu" class="md:hidden hidden bg-accent border-t border-gray-800">
+        <div class="container mx-auto px-4 py-4 space-y-4">
+            <a href="/welcome" class="block text-primary font-medium">Inicio</a>
+            <a href="/explore" class="block hover:text-primary transition">Explorar</a>
+            <a href="/how-it-works" class="block hover:text-primary transition">Cómo funciona</a>
+            <div class="pt-4 border-t border-gray-700 space-y-3">
+                <a href="/login" class="block hover:text-primary transition">Iniciar Sesión</a>
+                <a href="/register" class="block bg-primary hover:bg-orange-600 text-white px-4 py-3 rounded-md text-center transition">Registrarse</a>
+            </div>
+        </div>
+    </div>
 </header>
 
-<section class="bg-gradient-to-r from-secondary to-accent py-20">
+<!-- Hero Section Responsive -->
+<section class="bg-gradient-to-r from-secondary to-accent py-12 md:py-20">
     <div class="container mx-auto px-4 text-center">
-        <h1 class="text-5xl font-bold mb-6">Descubre los mejores proyectos freelance</h1>
-        <p class="text-xl mb-10 max-w-2xl mx-auto">Conecta con talento excepcional o encuentra proyectos que impulsen tu carrera</p>
+        <h1 class="text-3xl md:text-5xl font-bold mb-4 md:mb-6">Descubre los mejores proyectos freelance</h1>
+        <p class="text-base md:text-xl mb-8 md:mb-10 max-w-2xl mx-auto">Conecta con talento excepcional o encuentra proyectos que impulsen tu carrera</p>
         <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <a href="/register-estudiante" class="bg-primary hover:bg-orange-600 text-white px-8 py-3 rounded-md text-lg font-medium transition">Soy Freelancer</a>
-            <a href="/register-contratista" class="bg-white hover:bg-gray-200 text-secondary px-8 py-3 rounded-md text-lg font-medium transition">Busco Talento</a>
+            <a href="/register-estudiante" class="bg-primary hover:bg-orange-600 text-white px-6 md:px-8 py-3 rounded-md text-base md:text-lg font-medium transition">Soy Freelancer</a>
+            <a href="/register-contratista" class="bg-white hover:bg-gray-200 text-secondary px-6 md:px-8 py-3 rounded-md text-base md:text-lg font-medium transition">Busco Talento</a>
         </div>
     </div>
 </section>
 
-<section class="py-16 bg-accent">
+<!-- Categorías Responsive -->
+<section class="py-12 md:py-16 bg-accent">
     <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center mb-12">Categorías Populares</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8" th:if="${categorias != null and !categorias.isEmpty()}">
+        <h2 class="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">Categorías Populares</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8" th:if="${categorias != null and !categorias.isEmpty()}">
             <div class="bg-secondary p-6 rounded-lg border border-gray-800 hover:border-primary transition group hover:scale-105 transform duration-300"
                  th:each="categoria : ${categorias}">
                 <div th:class="'w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transform duration-300 ' + ${categoria.colorClass}">
@@ -68,40 +96,40 @@
     </div>
 </section>
 
-<section class="py-16 bg-gray-900">
+<!-- App Download Responsive -->
+<section class="py-12 md:py-16 bg-gray-900">
     <div class="container mx-auto px-4">
         <div class="flex flex-col md:flex-row items-center justify-center gap-8">
-
             <div class="flex-shrink-0 text-center">
-                <div class="p-8 bg-orange-500 rounded-full">
-                    <i class="fas fa-mobile-alt text-white text-6xl"></i>
+                <div class="p-6 md:p-8 bg-orange-500 rounded-full">
+                    <i class="fas fa-mobile-alt text-white text-4xl md:text-6xl"></i>
                 </div>
             </div>
-
             <div class="text-center md:text-left">
-                <h2 class="text-3xl font-bold mb-4">Lleva Hirelance Contigo</h2>
-                <p class="text-lg text-gray-400 mb-6 max-w-lg">
+                <h2 class="text-2xl md:text-3xl font-bold mb-4">Lleva Hirelance Contigo</h2>
+                <p class="text-base md:text-lg text-gray-400 mb-6 max-w-lg">
                     Gestiona tus proyectos, revisa postulaciones y mantente conectado
                     con la app oficial de Hirelance. ¡Descárgala ahora!
                 </p>
-
                 <a th:href="@{/downloads/Hirelance.apk}"
                    download="Hirelance.apk"
-                   class="bg-white hover:bg-gray-200 text-secondary px-8 py-3 rounded-md text-lg font-medium transition inline-flex items-center">
+                   class="bg-white hover:bg-gray-200 text-secondary px-6 md:px-8 py-3 rounded-md text-base md:text-lg font-medium transition inline-flex items-center justify-center">
                     <i class="fab fa-android mr-2"></i>
                     Descargar APK
                 </a>
             </div>
-
         </div>
     </div>
 </section>
 
+<!-- Footer Responsive -->
 <footer class="bg-secondary border-t border-gray-800 py-8">
     <div class="container mx-auto px-4">
         <div class="flex flex-col md:flex-row justify-between items-center">
-            <div class="mb-4 md:mb-0">
-                <a href="/welcome" class="text-2xl font-bold text-primary"><img th:src="@{/img/Hirelance-Logo-grupo19.png.png}"  class="h-24 w-29 " alt="Hirelance Logo"></a>
+            <div class="mb-6 md:mb-0 text-center md:text-left">
+                <a href="/welcome" class="text-2xl font-bold text-primary">
+                    <img th:src="@{/img/Hirelance-Logo-grupo19.png.png}" class="h-16 md:h-24 w-auto mx-auto md:mx-0" alt="Hirelance Logo">
+                </a>
                 <p class="text-gray-400 mt-2">Conectando talento con oportunidades</p>
             </div>
             <div class="flex space-x-4">
@@ -124,5 +152,19 @@
         </div>
     </div>
 </footer>
+
+<!-- Script del Menú Móvil -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+    });
+</script>
 </body>
 </html>

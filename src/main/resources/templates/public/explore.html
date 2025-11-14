@@ -8,31 +8,54 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-black text-white">
-<!-- Header -->
+<!-- Header Responsive -->
 <header class="bg-black border-b border-gray-800">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
         <div class="flex items-center">
             <a href="/" class="text-2xl font-bold text-orange-500">
-                <img th:src="@{/img/Hirelance-Logo-grupo19.png.png}" class="h-24 w-29" alt="Hirelance Logo">
+                <img th:src="@{/img/Hirelance-Logo-grupo19.png.png}" class="h-16 md:h-24 w-auto" alt="Hirelance Logo">
             </a>
         </div>
+
+        <!-- Menú hamburguesa para móvil -->
+        <div class="md:hidden">
+            <button id="menu-btn" class="text-white focus:outline-none">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Navegación desktop -->
         <nav class="hidden md:flex space-x-6">
             <a href="/" class="hover:text-orange-500 transition">Inicio</a>
             <a href="/explore" class="text-orange-500 font-medium">Explorar</a>
             <a href="/how-it-works" class="hover:text-orange-500 transition">Cómo funciona</a>
         </nav>
-        <div class="flex items-center space-x-4">
+
+        <div class="hidden md:flex items-center space-x-4">
             <a href="/login" class="hover:text-orange-500 transition">Iniciar Sesión</a>
             <a href="/register" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md transition">Registrarse</a>
         </div>
     </div>
+
+    <!-- Menú móvil -->
+    <div id="mobile-menu" class="md:hidden hidden bg-gray-900 border-t border-gray-800">
+        <div class="container mx-auto px-4 py-4 space-y-4">
+            <a href="/" class="block hover:text-orange-500 transition">Inicio</a>
+            <a href="/explore" class="block text-orange-500 font-medium">Explorar</a>
+            <a href="/how-it-works" class="block hover:text-orange-500 transition">Cómo funciona</a>
+            <div class="pt-4 border-t border-gray-700 space-y-3">
+                <a href="/login" class="block hover:text-orange-500 transition">Iniciar Sesión</a>
+                <a href="/register" class="block bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-md text-center transition">Registrarse</a>
+            </div>
+        </div>
+    </div>
 </header>
 
-<!-- Hero Section -->
-<section class="bg-gradient-to-r from-black to-gray-800 py-16">
+<!-- Hero Section Responsive -->
+<section class="bg-gradient-to-r from-black to-gray-800 py-12 md:py-16">
     <div class="container mx-auto px-4 text-center">
-        <h1 class="text-4xl font-bold mb-4">Descubre proyectos y postulaciones destacadas</h1>
-        <div class="max-w-2xl mx-auto relative mt-8">
+        <h1 class="text-2xl md:text-4xl font-bold mb-4">Descubre proyectos y postulaciones destacadas</h1>
+        <div class="max-w-2xl mx-auto relative mt-6 md:mt-8">
             <form th:action="@{/explore}" method="get" id="searchForm">
                 <input type="hidden" name="tab" th:value="${tabActivo}">
                 <input type="hidden" name="categoria" th:value="${categoriaSeleccionada}">
@@ -43,9 +66,9 @@
                        name="busqueda"
                        th:value="${busqueda}"
                        placeholder="Buscar proyectos, postulaciones o talentos..."
-                       class="w-full px-6 py-4 bg-black border border-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500"
+                       class="w-full px-4 md:px-6 py-3 md:py-4 bg-black border border-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm md:text-base"
                        id="searchInput">
-                <button type="submit" class="absolute right-2 top-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-full transition">
+                <button type="submit" class="absolute right-2 top-2 bg-orange-500 hover:bg-orange-600 text-white px-4 md:px-6 py-2 rounded-full transition">
                     <i class="fas fa-search"></i>
                 </button>
             </form>
@@ -53,67 +76,67 @@
     </div>
 </section>
 
-<!-- Tabs -->
-<section class="py-8 border-b border-gray-800">
+<!-- Tabs Responsive -->
+<section class="py-6 md:py-8 border-b border-gray-800">
     <div class="container mx-auto px-4">
-        <div class="flex flex-wrap space-x-4 md:space-x-8 justify-center">
+        <div class="flex flex-wrap justify-center gap-2 md:gap-4 md:space-x-4 md:space-x-8">
             <a th:href="@{/explore(tab='proyectos', busqueda=${busqueda}, categoria=${categoriaSeleccionada})}"
                th:class="${tabActivo == 'proyectos'} ?
-                   'text-lg md:text-xl font-bold text-orange-500 border-b-2 border-orange-500 pb-2' :
-                   'text-lg md:text-xl font-bold text-gray-400 hover:text-white border-b-2 border-transparent pb-2 transition'">
+                   'text-base md:text-lg lg:text-xl font-bold text-orange-500 border-b-2 border-orange-500 pb-2 px-2' :
+                   'text-base md:text-lg lg:text-xl font-bold text-gray-400 hover:text-white border-b-2 border-transparent pb-2 px-2 transition'">
                 Proyectos
             </a>
             <a th:href="@{/explore(tab='estudiantes', busqueda=${busqueda})}"
                th:class="${tabActivo == 'estudiantes'} ?
-                   'text-lg md:text-xl font-bold text-orange-500 border-b-2 border-orange-500 pb-2' :
-                   'text-lg md:text-xl font-bold text-gray-400 hover:text-white border-b-2 border-transparent pb-2 transition'">
+                   'text-base md:text-lg lg:text-xl font-bold text-orange-500 border-b-2 border-orange-500 pb-2 px-2' :
+                   'text-base md:text-lg lg:text-xl font-bold text-gray-400 hover:text-white border-b-2 border-transparent pb-2 px-2 transition'">
                 Estudiantes
             </a>
             <a th:href="@{/explore(tab='contratistas', busqueda=${busqueda})}"
                th:class="${tabActivo == 'contratistas'} ?
-                   'text-lg md:text-xl font-bold text-orange-500 border-b-2 border-orange-500 pb-2' :
-                   'text-lg md:text-xl font-bold text-gray-400 hover:text-white border-b-2 border-transparent pb-2 transition'">
+                   'text-base md:text-lg lg:text-xl font-bold text-orange-500 border-b-2 border-orange-500 pb-2 px-2' :
+                   'text-base md:text-lg lg:text-xl font-bold text-gray-400 hover:text-white border-b-2 border-transparent pb-2 px-2 transition'">
                 Contratistas
             </a>
         </div>
     </div>
 </section>
 
-<!-- Proyectos Section -->
-<section th:if="${tabActivo == 'proyectos'}" class="py-16">
+<!-- Proyectos Section Responsive -->
+<section th:if="${tabActivo == 'proyectos'}" class="py-12 md:py-16">
     <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold mb-8">Proyectos Disponibles</h2>
+        <h2 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Proyectos Disponibles</h2>
 
-        <!-- Filtros -->
+        <!-- Filtros Responsive -->
         <div class="flex flex-wrap gap-2 mb-6">
             <a th:href="@{/explore(tab='proyectos', categoria='all')}"
                th:class="${categoriaSeleccionada == 'all'} ?
-                   'bg-orange-500 text-white px-4 py-2 rounded-md text-sm transition' :
-                   'bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm transition'">
+                   'bg-orange-500 text-white px-3 md:px-4 py-2 rounded-md text-xs md:text-sm transition' :
+                   'bg-gray-700 hover:bg-gray-600 text-white px-3 md:px-4 py-2 rounded-md text-xs md:text-sm transition'">
                 Todos
             </a>
             <th:block th:each="categoria : ${categorias}">
                 <a th:href="@{/explore(tab='proyectos', categoria=${categoria.nombre})}"
                    th:class="${categoriaSeleccionada == categoria.nombre} ?
-                       'bg-orange-500 text-white px-4 py-2 rounded-md text-sm transition' :
-                       'bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm transition'"
+                       'bg-orange-500 text-white px-3 md:px-4 py-2 rounded-md text-xs md:text-sm transition' :
+                       'bg-gray-700 hover:bg-gray-600 text-white px-3 md:px-4 py-2 rounded-md text-xs md:text-sm transition'"
                    th:text="${categoria.nombre}">
                 </a>
             </th:block>
         </div>
 
-        <!-- Grid de Proyectos -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Grid de Proyectos Responsive -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             <th:block th:each="proyecto : ${proyectos}">
                 <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden hover:border-orange-500 transition">
-                    <div class="p-6">
+                    <div class="p-4 md:p-6">
                         <div class="flex items-center mb-4">
-                            <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-code text-white"></i>
+                            <div class="w-8 h-8 md:w-10 md:h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-code text-white text-sm md:text-base"></i>
                             </div>
-                            <h3 class="text-xl font-bold ml-3" th:text="${proyecto.titulo}">Título del Proyecto</h3>
+                            <h3 class="text-lg md:text-xl font-bold ml-3" th:text="${proyecto.titulo}">Título del Proyecto</h3>
                         </div>
-                        <p class="text-gray-400 mb-4 line-clamp-3" th:text="${proyecto.descripcion}">Descripción del proyecto...</p>
+                        <p class="text-gray-400 text-sm md:text-base mb-4 line-clamp-3" th:text="${proyecto.descripcion}">Descripción del proyecto...</p>
 
                         <!-- Estado del proyecto -->
                         <div class="mb-3">
@@ -126,7 +149,7 @@
                         </div>
 
                         <!-- Información del contratista -->
-                        <div class="mb-4 text-sm text-gray-400">
+                        <div class="mb-4 text-xs md:text-sm text-gray-400">
                             <span th:if="${proyecto.contratista != null}">
                                 Publicado por: <span class="text-orange-500" th:text="${proyecto.contratista.nombre} + ' ' + ${proyecto.contratista.apellido}"></span>
                             </span>
@@ -136,9 +159,9 @@
                         </div>
 
                         <div class="flex justify-between items-center">
-                            <span class="text-orange-500 font-medium" th:text="'$' + ${#numbers.formatDecimal(proyecto.presupuesto, 1, 2)}">$800 - $1,200</span>
+                            <span class="text-orange-500 font-medium text-sm md:text-base" th:text="'$' + ${#numbers.formatDecimal(proyecto.presupuesto, 1, 2)}">$800 - $1,200</span>
                             <a th:href="@{/login}"
-                               class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm transition">
+                               class="bg-orange-500 hover:bg-orange-600 text-white px-3 md:px-4 py-2 rounded-md text-xs md:text-sm transition">
                                 Ver Detalles
                             </a>
                         </div>
@@ -147,16 +170,16 @@
             </th:block>
 
             <th:block th:if="${#lists.isEmpty(proyectos)}">
-                <div class="col-span-3 text-center py-12">
-                    <i class="fas fa-inbox text-6xl text-gray-600 mb-4"></i>
-                    <h3 class="text-2xl font-bold text-gray-400">No hay proyectos disponibles</h3>
-                    <p class="text-gray-500 mt-2" th:if="${busqueda != null}">
+                <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-12">
+                    <i class="fas fa-inbox text-4xl md:text-6xl text-gray-600 mb-4"></i>
+                    <h3 class="text-xl md:text-2xl font-bold text-gray-400">No hay proyectos disponibles</h3>
+                    <p class="text-gray-500 mt-2 text-sm md:text-base" th:if="${busqueda != null}">
                         No se encontraron proyectos para "<span th:text="${busqueda}" class="text-orange-500"></span>"
                     </p>
-                    <p class="text-gray-500 mt-2" th:if="${busqueda == null && categoriaSeleccionada != 'all'}">
+                    <p class="text-gray-500 mt-2 text-sm md:text-base" th:if="${busqueda == null && categoriaSeleccionada != 'all'}">
                         No se encontraron proyectos para la categoría seleccionada.
                     </p>
-                    <p class="text-gray-500 mt-2" th:if="${busqueda == null && categoriaSeleccionada == 'all'}">
+                    <p class="text-gray-500 mt-2 text-sm md:text-base" th:if="${busqueda == null && categoriaSeleccionada == 'all'}">
                         No hay proyectos disponibles en este momento.
                     </p>
                 </div>
@@ -165,52 +188,54 @@
     </div>
 </section>
 
-<section th:if="${tabActivo == 'estudiantes'}" class="py-16">
+<!-- Estudiantes Section Responsive -->
+<section th:if="${tabActivo == 'estudiantes'}" class="py-12 md:py-16">
     <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold mb-8">Perfiles de Estudiantes</h2>
+        <h2 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Perfiles de Estudiantes</h2>
 
         <div class="flex flex-wrap gap-2 mb-6">
             <a th:href="@{/explore(tab='estudiantes', habilidad='all')}"
                th:class="${habilidadSeleccionada == 'all'} ?
-                   'bg-orange-500 text-white px-4 py-2 rounded-md text-sm transition' :
-                   'bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm transition'">
+                   'bg-orange-500 text-white px-3 md:px-4 py-2 rounded-md text-xs md:text-sm transition' :
+                   'bg-gray-700 hover:bg-gray-600 text-white px-3 md:px-4 py-2 rounded-md text-xs md:text-sm transition'">
                 Todos
             </a>
             <th:block th:each="habilidad : ${habilidades}">
                 <a th:href="@{/explore(tab='estudiantes', habilidad=${habilidad.titulo})}"
                    th:class="${habilidadSeleccionada == habilidad.titulo} ?
-                       'bg-orange-500 text-white px-4 py-2 rounded-md text-sm transition' :
-                       'bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm transition'"
+                       'bg-orange-500 text-white px-3 md:px-4 py-2 rounded-md text-xs md:text-sm transition' :
+                       'bg-gray-700 hover:bg-gray-600 text-white px-3 md:px-4 py-2 rounded-md text-xs md:text-sm transition'"
                    th:text="${habilidad.titulo}">
                 </a>
             </th:block>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             <th:block th:each="vm : ${estudiantes}">
                 <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden hover:border-orange-500 transition">
-                    <div class="p-6">
+                    <div class="p-4 md:p-6">
                         <div class="flex items-center mb-4">
-                            <div th:if="${vm.base64Image == null}" class="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center">
-                                <i class="fas fa-user-graduate text-white text-2xl"></i>
+                            <div th:if="${vm.base64Image == null}" class="w-12 h-12 md:w-16 md:h-16 bg-orange-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user-graduate text-white text-lg md:text-2xl"></i>
                             </div>
                             <img th:if="${vm.base64Image != null}"
                                  th:src="'data:image/jpeg;base64,' + ${vm.base64Image}"
-                                 alt="Foto de perfil" class="w-16 h-16 rounded-full object-cover">
+                                 alt="Foto de perfil" class="w-12 h-12 md:w-16 md:h-16 rounded-full object-cover">
 
-                            <div class="ml-4">
-                                <h3 class="text-xl font-bold" th:text="${vm.usuario.nombre} + ' ' + ${vm.usuario.apellido}">Nombre Estudiante</h3>
-                                <p class="text-orange-500" th:text="${vm.usuario.perfilEstudiante?.carrera}">Carrera</p>
+                            <div class="ml-3 md:ml-4">
+                                <h3 class="text-lg md:text-xl font-bold" th:text="${vm.usuario.nombre} + ' ' + ${vm.usuario.apellido}">Nombre Estudiante</h3>
+                                <p class="text-orange-500 text-sm md:text-base" th:text="${vm.usuario.perfilEstudiante?.carrera}">Carrera</p>
                             </div>
                         </div>
 
-                        <p class="text-gray-400 text-sm mb-4 line-clamp-3"
+                        <p class="text-gray-400 text-xs md:text-sm mb-4 line-clamp-3"
                            th:text="${vm.usuario.perfilEstudiante?.descripcion != null ? vm.usuario.perfilEstudiante.descripcion : 'Estudiante sin descripción.'}">
                             Descripción del estudiante...
                         </p>
 
                         <div class="text-right">
                             <a th:href="@{/public-profile-estudiante}"
-                               class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm transition">
+                               class="bg-orange-500 hover:bg-orange-600 text-white px-3 md:px-4 py-2 rounded-md text-xs md:text-sm transition">
                                 Ver Perfil
                             </a>
                         </div>
@@ -219,13 +244,13 @@
             </th:block>
 
             <th:block th:if="${#lists.isEmpty(estudiantes)}">
-                <div class="col-span-3 text-center py-12">
-                    <i class="fas fa-user-graduate text-6xl text-gray-600 mb-4"></i>
-                    <h3 class="text-2xl font-bold text-gray-400">No se encontraron estudiantes</h3>
-                    <p class="text-gray-500 mt-2" th:if="${busqueda != null}">
+                <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-12">
+                    <i class="fas fa-user-graduate text-4xl md:text-6xl text-gray-600 mb-4"></i>
+                    <h3 class="text-xl md:text-2xl font-bold text-gray-400">No se encontraron estudiantes</h3>
+                    <p class="text-gray-500 mt-2 text-sm md:text-base" th:if="${busqueda != null}">
                         No se encontraron perfiles para "<span th:text="${busqueda}" class="text-orange-500"></span>"
                     </p>
-                    <p class="text-gray-500 mt-2" th:if="${busqueda == null}">
+                    <p class="text-gray-500 mt-2 text-sm md:text-base" th:if="${busqueda == null}">
                         No hay perfiles de estudiantes disponibles en este momento.
                     </p>
                 </div>
@@ -234,53 +259,54 @@
     </div>
 </section>
 
-<section th:if="${tabActivo == 'contratistas'}" class="py-16">
+<!-- Contratistas Section Responsive -->
+<section th:if="${tabActivo == 'contratistas'}" class="py-12 md:py-16">
     <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold mb-8">Perfiles de Contratistas</h2>
+        <h2 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Perfiles de Contratistas</h2>
 
         <div class="flex flex-wrap gap-2 mb-6">
             <a th:href="@{/explore(tab='contratistas', ubicacion='all')}"
                th:class="${ubicacionSeleccionada == 'all'} ?
-                   'bg-orange-500 text-white px-4 py-2 rounded-md text-sm transition' :
-                   'bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm transition'">
+                   'bg-orange-500 text-white px-3 md:px-4 py-2 rounded-md text-xs md:text-sm transition' :
+                   'bg-gray-700 hover:bg-gray-600 text-white px-3 md:px-4 py-2 rounded-md text-xs md:text-sm transition'">
                 Todos
             </a>
             <th:block th:each="departamento : ${departamentos}">
                 <a th:href="@{/explore(tab='contratistas', ubicacion=${departamento})}"
                    th:class="${ubicacionSeleccionada == departamento} ?
-                       'bg-orange-500 text-white px-4 py-2 rounded-md text-sm transition' :
-                       'bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm transition'"
+                       'bg-orange-500 text-white px-3 md:px-4 py-2 rounded-md text-xs md:text-sm transition' :
+                       'bg-gray-700 hover:bg-gray-600 text-white px-3 md:px-4 py-2 rounded-md text-xs md:text-sm transition'"
                    th:text="${departamento}">
                 </a>
             </th:block>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             <th:block th:each="vm : ${contratistas}">
                 <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden hover:border-orange-500 transition">
-                    <div class="p-6">
+                    <div class="p-4 md:p-6">
                         <div class="flex items-center mb-4">
-                            <div th:if="${vm.base64Image == null}" class="w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-building text-white text-2xl"></i>
+                            <div th:if="${vm.base64Image == null}" class="w-12 h-12 md:w-16 md:h-16 bg-gray-700 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-building text-white text-lg md:text-2xl"></i>
                             </div>
                             <img th:if="${vm.base64Image != null}"
                                  th:src="'data:image/jpeg;base64,' + ${vm.base64Image}"
-                                 alt="Logo de empresa" class="w-16 h-16 rounded-lg object-cover">
+                                 alt="Logo de empresa" class="w-12 h-12 md:w-16 md:h-16 rounded-lg object-cover">
 
-                            <div class="ml-4">
-                                <h3 class="text-xl font-bold" th:text="${vm.contratista.perfilContratista?.empresa}">Nombre de Empresa</h3>
-                                <p class="text-orange-500" th:text="${vm.contratista.nombre} + ' ' + ${vm.contratista.apellido}">Reclutador</p>
+                            <div class="ml-3 md:ml-4">
+                                <h3 class="text-lg md:text-xl font-bold" th:text="${vm.contratista.perfilContratista?.empresa}">Nombre de Empresa</h3>
+                                <p class="text-orange-500 text-sm md:text-base" th:text="${vm.contratista.nombre} + ' ' + ${vm.contratista.apellido}">Reclutador</p>
                             </div>
                         </div>
 
-                        <p class="text-gray-400 text-sm mb-4 line-clamp-3"
+                        <p class="text-gray-400 text-xs md:text-sm mb-4 line-clamp-3"
                            th:text="${vm.contratista.perfilContratista?.descripcion != null ? vm.contratista.perfilContratista.descripcion : 'Contratista sin descripción.'}">
                             Descripción del contratista...
                         </p>
 
                         <div class="text-right">
                             <a th:href="@{/public-profile-contratista}"
-                               class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm transition">
+                               class="bg-orange-500 hover:bg-orange-600 text-white px-3 md:px-4 py-2 rounded-md text-xs md:text-sm transition">
                                 Ver Perfil
                             </a>
                         </div>
@@ -289,13 +315,13 @@
             </th:block>
 
             <th:block th:if="${#lists.isEmpty(contratistas)}">
-                <div class="col-span-3 text-center py-12">
-                    <i class="fas fa-building text-6xl text-gray-600 mb-4"></i>
-                    <h3 class="text-2xl font-bold text-gray-400">No se encontraron contratistas</h3>
-                    <p class="text-gray-500 mt-2" th:if="${busqueda != null}">
+                <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-12">
+                    <i class="fas fa-building text-4xl md:text-6xl text-gray-600 mb-4"></i>
+                    <h3 class="text-xl md:text-2xl font-bold text-gray-400">No se encontraron contratistas</h3>
+                    <p class="text-gray-500 mt-2 text-sm md:text-base" th:if="${busqueda != null}">
                         No se encontraron perfiles para "<span th:text="${busqueda}" class="text-orange-500"></span>"
                     </p>
-                    <p class="text-gray-500 mt-2" th:if="${busqueda == null}">
+                    <p class="text-gray-500 mt-2 text-sm md:text-base" th:if="${busqueda == null}">
                         No hay perfiles de contratistas disponibles en este momento.
                     </p>
                 </div>
@@ -304,13 +330,13 @@
     </div>
 </section>
 
-<!-- Footer -->
+<!-- Footer Responsive -->
 <footer class="bg-black border-t border-gray-800 py-8">
     <div class="container mx-auto px-4">
         <div class="flex flex-col md:flex-row justify-between items-center">
-            <div class="mb-4 md:mb-0">
+            <div class="mb-6 md:mb-0 text-center md:text-left">
                 <a href="/" class="text-2xl font-bold text-orange-500">
-                    <img th:src="@{/img/Hirelance-Logo-grupo19.png.png}" class="h-24 w-29" alt="Hirelance Logo">
+                    <img th:src="@{/img/Hirelance-Logo-grupo19.png.png}" class="h-16 md:h-24 w-auto mx-auto md:mx-0" alt="Hirelance Logo">
                 </a>
                 <p class="text-gray-400 mt-2">Conectando talento con oportunidades</p>
             </div>
@@ -329,6 +355,20 @@
 
 <!-- Scripts -->
 <script th:src="@{/js/explore.js}"></script>
+
+<!-- Script del Menú Móvil -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+    });
+</script>
 
 <style>
     .line-clamp-3 {

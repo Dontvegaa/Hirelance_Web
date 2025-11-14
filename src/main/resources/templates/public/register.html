@@ -21,51 +21,84 @@
     </script>
 </head>
 <body class="bg-secondary text-white">
+<!-- Header Responsive --><!-- Header Responsive -->
 <header class="bg-secondary border-b border-gray-800">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
         <div class="flex items-center">
-            <a href="/" class="text-2xl font-bold text-primary"><img th:src="@{/img/Hirelance-Logo-grupo19.png.png}" class="h-24 w-29 " alt="Hirelance Logo"></a>
+            <a href="/" class="text-2xl font-bold text-primary">
+                <img th:src="@{/img/Hirelance-Logo-grupo19.png.png}" class="h-16 md:h-24 w-auto" alt="Hirelance Logo">
+            </a>
         </div>
-        <div class="flex items-center space-x-4">
+
+        <!-- Menú hamburguesa para móvil -->
+        <div class="md:hidden">
+            <button id="menu-btn" class="text-white focus:outline-none">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Navegación desktop -->
+        <nav class="hidden md:flex space-x-6">
+            <a href="/" class="hover:text-primary transition">Inicio</a>
+            <a href="/explore" class="hover:text-primary transition">Explorar</a>
+            <a href="/how-it-works" class="hover:text-primary transition">Cómo funciona</a>
+        </nav>
+
+        <div class="hidden md:flex items-center space-x-4">
             <a href="/login" class="hover:text-primary transition">Iniciar Sesión</a>
             <a href="/register" class="bg-primary hover:bg-orange-600 text-white px-4 py-2 rounded-md transition">Registrarse</a>
         </div>
     </div>
+
+    <!-- Menú móvil -->
+    <div id="mobile-menu" class="md:hidden hidden bg-accent border-t border-gray-800">
+        <div class="container mx-auto px-4 py-4 space-y-4">
+            <a href="/" class="block hover:text-primary transition">Inicio</a>
+            <a href="/explore" class="block hover:text-primary transition">Explorar</a>
+            <a href="/how-it-works" class="block hover:text-primary transition">Cómo funciona</a>
+            <div class="pt-4 border-t border-gray-700 space-y-3">
+                <a href="/login" class="block hover:text-primary transition">Iniciar Sesión</a>
+                <a href="/register" class="block bg-primary hover:bg-orange-600 text-white px-4 py-3 rounded-md text-center transition">Registrarse</a>
+            </div>
+        </div>
+    </div>
 </header>
 
-<section class="min-h-screen flex items-center justify-center py-12 px-4">
+<!-- Selección de Cuenta Responsive -->
+<section class="min-h-screen flex items-center justify-center py-8 px-4">
     <div class="max-w-4xl w-full">
-        <div class="text-center mb-12">
-            <h1 class="text-4xl font-bold mb-4">Únete a Hirelance</h1>
-            <p class="text-xl text-gray-400 max-w-2xl mx-auto">Selecciona el tipo de cuenta que mejor se adapte a tus necesidades</p>
+        <div class="text-center mb-8 md:mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Únete a Hirelance</h1>
+            <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">Selecciona el tipo de cuenta que mejor se adapte a tus necesidades</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-accent p-8 rounded-lg border border-gray-800 hover:border-primary transition group">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            <!-- Tarjeta Estudiante -->
+            <div class="bg-accent p-6 md:p-8 rounded-lg border border-gray-800 hover:border-primary transition group">
                 <div class="text-center mb-6">
-                    <div class="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
-                        <i class="fas fa-graduation-cap text-white text-3xl"></i>
+                    <div class="w-16 h-16 md:w-20 md:h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                        <i class="fas fa-graduation-cap text-white text-2xl md:text-3xl"></i>
                     </div>
-                    <h3 class="text-2xl font-bold mb-2">Estudiante</h3>
+                    <h3 class="text-xl md:text-2xl font-bold mb-2">Estudiante</h3>
                     <p class="text-gray-400">Busca proyectos y gana experiencia</p>
                 </div>
 
-                <ul class="space-y-3 mb-8">
+                <ul class="space-y-3 mb-6 md:mb-8">
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3"></i>
-                        <span>Encuentra proyectos freelance</span>
+                        <span class="text-sm md:text-base">Encuentra proyectos freelance</span>
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3"></i>
-                        <span>Construye tu portafolio</span>
+                        <span class="text-sm md:text-base">Construye tu portafolio</span>
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3"></i>
-                        <span>Gana experiencia real</span>
+                        <span class="text-sm md:text-base">Gana experiencia real</span>
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3"></i>
-                        <span>Conecta con empresas</span>
+                        <span class="text-sm md:text-base">Conecta con empresas</span>
                     </li>
                 </ul>
 
@@ -74,31 +107,32 @@
                 </a>
             </div>
 
-            <div class="bg-accent p-8 rounded-lg border border-gray-800 hover:border-primary transition group">
+            <!-- Tarjeta Contratista -->
+            <div class="bg-accent p-6 md:p-8 rounded-lg border border-gray-800 hover:border-primary transition group">
                 <div class="text-center mb-6">
-                    <div class="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
-                        <i class="fas fa-briefcase text-white text-3xl"></i>
+                    <div class="w-16 h-16 md:w-20 md:h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition">
+                        <i class="fas fa-briefcase text-white text-2xl md:text-3xl"></i>
                     </div>
-                    <h3 class="text-2xl font-bold mb-2">Contratista</h3>
+                    <h3 class="text-xl md:text-2xl font-bold mb-2">Contratista</h3>
                     <p class="text-gray-400">Encuentra talento estudiantil</p>
                 </div>
 
-                <ul class="space-y-3 mb-8">
+                <ul class="space-y-3 mb-6 md:mb-8">
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3"></i>
-                        <span>Publica proyectos</span>
+                        <span class="text-sm md:text-base">Publica proyectos</span>
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3"></i>
-                        <span>Encuentra talento joven</span>
+                        <span class="text-sm md:text-base">Encuentra talento joven</span>
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3"></i>
-                        <span>Costos competitivos</span>
+                        <span class="text-sm md:text-base">Costos competitivos</span>
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3"></i>
-                        <span>Apoya a estudiantes</span>
+                        <span class="text-sm md:text-base">Apoya a estudiantes</span>
                     </li>
                 </ul>
 
@@ -119,5 +153,33 @@
         <p>&copy; 2025 Hirelance. Todos los derechos reservados.</p>
     </div>
 </footer>
+<!-- Script del Menú Móvil -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Cerrar menú al hacer clic en un enlace
+            const mobileLinks = mobileMenu.querySelectorAll('a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // Cerrar menú al hacer clic fuera de él
+            document.addEventListener('click', function(event) {
+                if (!menuBtn.contains(event.target) && !mobileMenu.contains(event.target)) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        }
+    });
+</script>
 </body>
 </html>
