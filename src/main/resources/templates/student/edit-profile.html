@@ -12,22 +12,26 @@
 <aside class="w-64 min-h-screen bg-gray-900 border-r border-gray-800 p-6">
     <a href="/student/dashboard" class="text-2xl font-bold text-orange-500">Hirelance</a>
     <nav class="mt-10">
-        <a th:href="@{/student/dashboard}" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+        <a href="/student/dashboard" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-tachometer-alt w-6 mr-2"></i> Dashboard
         </a>
-        <a th:href="@{/explore}" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+        <a href="/student/search-projects" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-search w-6 mr-2"></i> Buscar Proyectos
         </a>
-        <a th:href="@{/student/my-applications}" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+
+        <a href="/student/search-contractors" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-user-tie w-6 mr-2"></i> Buscar Contratistas
+        </a>
+        <a href="/student/my-applications" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-file-alt w-6 mr-2"></i> Mis Postulaciones
         </a>
-        <a th:href="@{/student/profile}" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+        <a href="/student/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-user-graduate w-6 mr-2"></i> Mi Perfil
         </a>
-        <a href="#" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+        <a href="/student/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
         </a>
-        <a th:href="@{/student/settings}" class="block py-2 px-4 bg-orange-500 text-white rounded">
+        <a href="/student/settings" class="block py-2 px-4 bg-orange-500 text-white rounded">
             <i class="fas fa-cog w-6 mr-2"></i> Ajustes
         </a>
     </nav>

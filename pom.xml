@@ -106,6 +106,44 @@
 				</configuration>
 			</plugin>
 		</plugins>
+        <resources>
+            <!-- Recursos normales CON filtrado (para properties, etc) -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <!-- EXCLUIR archivos binarios del filtrado -->
+                    <exclude>static/downloads/**</exclude>
+                    <exclude>static/uploads/**</exclude>
+                    <exclude>**/*.apk</exclude>
+                    <exclude>**/*.jar</exclude>
+                    <exclude>**/*.zip</exclude>
+                    <exclude>**/*.jpg</exclude>
+                    <exclude>**/*.jpeg</exclude>
+                    <exclude>**/*.png</exclude>
+                    <exclude>**/*.gif</exclude>
+                    <exclude>**/*.pdf</exclude>
+                </excludes>
+            </resource>
+
+            <!-- Recursos binarios SIN filtrado -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>static/downloads/**</include>
+                    <include>static/uploads/**</include>
+                    <include>**/*.apk</include>
+                    <include>**/*.jar</include>
+                    <include>**/*.zip</include>
+                    <include>**/*.jpg</include>
+                    <include>**/*.jpeg</include>
+                    <include>**/*.png</include>
+                    <include>**/*.gif</include>
+                    <include>**/*.pdf</include>
+                </includes>
+            </resource>
+        </resources>
 	</build>
 
 </project>

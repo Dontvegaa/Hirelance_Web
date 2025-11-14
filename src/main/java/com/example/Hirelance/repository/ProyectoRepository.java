@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.util.List;
+import java.util.Optional;
 
 public interface ProyectoRepository extends JpaRepository<Proyecto, Integer> {
 
@@ -67,4 +68,29 @@ public interface ProyectoRepository extends JpaRepository<Proyecto, Integer> {
      * Devuelve los 5 proyectos creados más recientemente.
      */
     List<Proyecto> findTop5ByOrderByFechaCreacionDesc();
+
+    @Query("SELECT p FROM Proyecto p LEFT JOIN FETCH p.habilidadesRequeridas WHERE p.idProyecto = :id")
+    Optional<Proyecto> findByIdWithHabilidades(@Param("id") Integer idProyecto);
+
+    /**
+     * Busca proyectos de un contratista, permitiendo filtrar por
+     * título de proyecto, estado y rango de presupuesto.
+     */
+    @Query("SELECT p FROM Proyecto p " +
+            "WHERE p.contratista.idUsuario = :idContratista " +
+            "AND (:busqueda IS NULL OR p.titulo LIKE %:busqueda%) " +
+            "AND (:estado = 'all' OR p.estado = :estadoEnum) " +
+            // --- NUEVAS LÍNEAS PARA PRESUPUESTO ---
+            "AND (:minBudget IS NULL OR p.presupuesto >= :minBudget) " +
+            "AND (:maxBudget IS NULL OR p.presupuesto <= :maxBudget) " +
+            // --- FIN DE LÍNEAS NUEVAS ---
+            "ORDER BY p.fechaCreacion DESC")
+    List<Proyecto> findByContratistaIdAndFilters(
+            @Param("idContratista") Integer idContratista,
+            @Param("busqueda") String busqueda,
+            @Param("estado") String estado,
+            @Param("estadoEnum") Proyecto.EstadoProyecto estadoEnum,
+            // --- NUEVOS PARÁMETROS ---
+            @Param("minBudget") Double minBudget,
+            @Param("maxBudget") Double maxBudget);
 }

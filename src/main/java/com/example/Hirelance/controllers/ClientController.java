@@ -1,5 +1,7 @@
 package com.example.Hirelance.controllers;
 
+import org.springframework.web.bind.annotation.RequestParam;
+
 import com.example.Hirelance.models.*;
 import com.example.Hirelance.repository.*;
 import jakarta.transaction.Transactional;
@@ -37,6 +39,8 @@ import com.example.Hirelance.dto.PasswordChangeDTO;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.example.Hirelance.config.CustomUserDetails;
+
+import com.example.Hirelance.models.Proyecto.EstadoProyecto;
 
 import java.util.stream.Collectors;
 
@@ -211,23 +215,201 @@ public class ClientController {
 
     /**
      * Muestra la lista de proyectos publicados por el contratista logueado.
+     * ¡ACTUALIZADO con filtros de búsqueda, estado y presupuesto!
      */
     @GetMapping("/my-projects")
     public String showMyProjects(
+            @RequestParam(required = false) String busqueda,
+            @RequestParam(required = false, defaultValue = "all") String estado,
+            // --- NUEVOS PARÁMETROS ---
+            @RequestParam(required = false) Double minBudget,
+            @RequestParam(required = false) Double maxBudget,
+            // --- FIN DE NUEVOS PARÁMETROS ---
             @AuthenticationPrincipal CustomUserDetails userDetails,
             Model model) {
 
-        // 1. Buscar todos los proyectos del contratista usando su ID
         Usuario usuario = userDetails.getUsuario();
+        List<Proyecto> misProyectos;
 
-        List<Proyecto> misProyectos = proyectoRepository
-                .findByContratistaIdUsuarioOrderByFechaCreacionDesc(usuario.getIdUsuario());
+        // Convertir el string 'estado' al tipo Enum
+        Proyecto.EstadoProyecto estadoEnum = null;
+        if (!estado.equals("all")) {
+            try {
+                estadoEnum = Proyecto.EstadoProyecto.valueOf(estado);
+            } catch (IllegalArgumentException e) {
+                // Manejar estado inválido, por defecto 'all'
+                estado = "all";
+            }
+        }
 
-        // 2. Añadir la lista de proyectos al modelo
+        // Usar el nuevo método del repositorio (actualizado)
+        misProyectos = proyectoRepository.findByContratistaIdAndFilters(
+                usuario.getIdUsuario(),
+                busqueda,
+                estado,
+                estadoEnum,
+                minBudget, // <-- Pasar nuevo parámetro
+                maxBudget  // <-- Pasar nuevo parámetro
+        );
+
+        // Enviar los filtros de vuelta a la vista para rellenar el formulario
         model.addAttribute("proyectos", misProyectos);
+        model.addAttribute("busqueda", busqueda);
+        model.addAttribute("estado", estado);
+        model.addAttribute("minBudget", minBudget); // <-- Pasar nuevo parámetro
+        model.addAttribute("maxBudget", maxBudget); // <-- Pasar nuevo parámetro
 
-        // 3. Devolver la ruta de la plantilla
-        return "client/my-projects"; // Apunta a client/my-projects.html
+        return "client/my-projects";
+    }
+    /**
+     * Muestra el formulario para EDITAR un proyecto existente.
+     * URL: /client/project/{id}/edit
+     */
+    @GetMapping("/project/{id}/edit")
+    public String showEditProjectForm(
+            @PathVariable("id") Integer proyectoId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            // 1. Verificar propiedad y obtener proyecto
+            Proyecto proyecto = checkProjectOwnership(proyectoId, userDetails.getUsuario());
+
+            // 2. Solo se pueden editar proyectos 'publicados'
+            if (proyecto.getEstado() != EstadoProyecto.publicado) {
+                redirectAttributes.addFlashAttribute("errorMessage", "No puedes editar un proyecto que ya está en progreso o finalizado.");
+                return "redirect:/client/my-projects";
+            }
+
+            // 3. Poblar el DTO con los datos del proyecto
+            ProjectDTO projectDTO = new ProjectDTO();
+            // ¡LÍNEA ELIMINADA! No necesitamos setear el ID en el DTO.
+            projectDTO.setTitulo(proyecto.getTitulo());
+            projectDTO.setDescripcion(proyecto.getDescripcion());
+            projectDTO.setPresupuesto(proyecto.getPresupuesto());
+            projectDTO.setFechaLimite(proyecto.getFechaLimite() != null ? proyecto.getFechaLimite().toLocalDate() : null);
+            projectDTO.setIdCategoria(proyecto.getCategoria().getIdCategoria());
+
+            // 4. Cargar categorías y enviar todo a la vista
+            model.addAttribute("projectDTO", projectDTO);
+            model.addAttribute("categorias", categoriaRepository.findAll());
+            model.addAttribute("pageTitle", "Editar Proyecto");
+            model.addAttribute("formAction", "/client/project/" + proyectoId + "/edit");
+
+            return "client/edit-project"; // Apunta a la NUEVA plantilla
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/client/my-projects";
+        }
+    }
+
+    /**
+     * Procesa el formulario de EDICIÓN de un proyecto.
+     * URL: /client/project/{id}/edit
+     */
+    @PostMapping("/project/{id}/edit")
+    @Transactional
+    public String processEditProjectForm(
+            @PathVariable("id") Integer proyectoId,
+            @Valid @ModelAttribute("projectDTO") ProjectDTO projectDTO,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            // 1. Verificar propiedad y obtener proyecto
+            Proyecto proyectoAEditar = checkProjectOwnership(proyectoId, userDetails.getUsuario());
+
+            // 2. Solo se pueden editar proyectos 'publicados'
+            if (proyectoAEditar.getEstado() != EstadoProyecto.publicado) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Este proyecto ya no se puede editar.");
+                return "redirect:/client/my-projects";
+            }
+
+            // 3. Validar errores del formulario
+            if (bindingResult.hasErrors()) {
+                model.addAttribute("categorias", categoriaRepository.findAll());
+                model.addAttribute("pageTitle", "Editar Proyecto");
+                model.addAttribute("formAction", "/client/project/" + proyectoId + "/edit");
+                return "client/edit-project";
+            }
+
+            // 4. Actualizar la entidad con los datos del DTO
+            proyectoAEditar.setTitulo(projectDTO.getTitulo());
+            proyectoAEditar.setDescripcion(projectDTO.getDescripcion());
+            proyectoAEditar.setPresupuesto(projectDTO.getPresupuesto());
+
+            if (projectDTO.getFechaLimite() != null) {
+                proyectoAEditar.setFechaLimite(projectDTO.getFechaLimite().atStartOfDay());
+            } else {
+                proyectoAEditar.setFechaLimite(null);
+            }
+
+            Categoria categoria = categoriaRepository.findById(projectDTO.getIdCategoria())
+                    .orElseThrow(() -> new Exception("Categoría no encontrada"));
+            proyectoAEditar.setCategoria(categoria);
+
+            // 5. Guardar cambios
+            proyectoRepository.save(proyectoAEditar);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Proyecto actualizado con éxito.");
+            return "redirect:/client/my-projects";
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al actualizar el proyecto: " + e.getMessage());
+            return "redirect:/client/my-projects";
+        }
+    }
+
+    /**
+     * ELIMINA un proyecto.
+     * URL: /client/project/{id}/delete
+     */
+    @PostMapping("/project/{id}/delete")
+    @Transactional
+    public String deleteProject(
+            @PathVariable("id") Integer proyectoId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            // 1. Verificar propiedad y obtener proyecto
+            Proyecto proyectoAEliminar = checkProjectOwnership(proyectoId, userDetails.getUsuario());
+
+            // 2. Solo se pueden eliminar proyectos 'publicados'
+            if (proyectoAEliminar.getEstado() != EstadoProyecto.publicado) {
+                redirectAttributes.addFlashAttribute("errorMessage", "No puedes eliminar un proyecto que está en progreso o finalizado.");
+                return "redirect:/client/my-projects";
+            }
+
+            // 3. Eliminar el proyecto
+            // (La BD debería borrar las postulaciones en cascada)
+            proyectoRepository.delete(proyectoAEliminar);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Proyecto eliminado con éxito.");
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al eliminar el proyecto: " + e.getMessage());
+        }
+
+        return "redirect:/client/my-projects";
+    }
+
+    /**
+     * Método de utilidad para verificar si un proyecto pertenece al
+     * contratista logueado. Lanza una excepción si no es así.
+     */
+    private Proyecto checkProjectOwnership(Integer proyectoId, Usuario contratista) throws Exception {
+        Proyecto proyecto = proyectoRepository.findById(proyectoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Proyecto no encontrado"));
+
+        if (!proyecto.getContratista().getIdUsuario().equals(contratista.getIdUsuario())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acceso denegado: Este proyecto no te pertenece.");
+        }
+        return proyecto;
     }
 
     /**
@@ -612,5 +794,42 @@ public class ClientController {
         model.addAttribute("estudiantes", estudiantesVM);
 
         return "client/search-freelancer"; // Apunta a client/search-freelancer.html
+    }
+
+    /**
+     * MUESTRA el perfil interno de un estudiante al contratista.
+     * URL: /client/student-profile/{id}
+     */
+    @GetMapping("/student-profile/{id}")
+    public String showStudentProfileInternal(
+            @PathVariable("id") Integer idEstudiante,
+            Model model,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        // 1. Buscar al estudiante con su perfil completo
+        //    (Usamos el método 'findByIdWithFullProfile' que ya debes tener en tu UsuarioRepository)
+        Usuario estudiante = usuarioRepository.findByIdWithFullProfile(idEstudiante)
+                .orElseThrow(() -> new RuntimeException("Estudiante no encontrado"));
+
+        // 2. Extraer los datos
+        PerfilEstudiante perfil = estudiante.getPerfilEstudiante();
+        Set<Habilidad> habilidades = estudiante.getHabilidades();
+        Set<Universidad> universidades = estudiante.getUniversidades();
+
+        // 3. Preparar la foto de perfil
+        String base64Photo = null;
+        if (perfil != null && perfil.getFotoPerfil() != null) {
+            base64Photo = Base64.getEncoder().encodeToString(perfil.getFotoPerfil());
+        }
+
+        // 4. Enviar todo al modelo
+        model.addAttribute("estudiante", estudiante);
+        model.addAttribute("perfil", perfil);
+        model.addAttribute("habilidades", habilidades);
+        model.addAttribute("universidades", universidades);
+        model.addAttribute("base64Photo", base64Photo);
+
+        // 5. Apuntar a la nueva plantilla HTML que crearemos
+        return "client/student-profile";
     }
 }

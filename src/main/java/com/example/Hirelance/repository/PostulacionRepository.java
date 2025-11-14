@@ -4,11 +4,12 @@ import com.example.Hirelance.models.Postulacion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.repository.query.Param; // ¡AÑADE ESTA LÍNEA!
+import org.springframework.data.repository.query.Param; // ¡AÑADE ESTA LÍNEA! <-- Esta línea estaba duplicada, la limpié
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+// import org.springframework.data.repository.query.Param; <-- Import duplicado eliminado
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PostulacionRepository extends JpaRepository<Postulacion, Integer> {
 
@@ -58,4 +59,27 @@ public interface PostulacionRepository extends JpaRepository<Postulacion, Intege
             "ORDER BY p.fechaPostulacion DESC")
     List<Postulacion> findAllByEstudianteIdWithProyecto(@Param("idEstudiante") Integer idEstudiante);
 
+    // boolean existsByEstudianteIdUsuarioAndProyectoIdProyecto(Integer estudianteId, Integer proyectoId); <-- ¡ELIMINADO! Era un duplicado.
+
+    /**
+     * Busca postulaciones de un estudiante, permitiendo filtrar por
+     * título de proyecto y por estado.
+     */
+    @Query("SELECT p FROM Postulacion p JOIN FETCH p.proyecto pr " +
+            "WHERE p.estudiante.idUsuario = :idEstudiante " +
+            "AND (:busqueda IS NULL OR pr.titulo LIKE %:busqueda%) " +
+            "AND (:estado = 'all' OR p.estado = :estadoEnum) " +
+            "ORDER BY p.fechaPostulacion DESC")
+    List<Postulacion> findByEstudianteAndFilters(
+            @Param("idEstudiante") Integer idEstudiante,
+            @Param("busqueda") String busqueda,
+            @Param("estado") String estado,
+            @Param("estadoEnum") Postulacion.EstadoPostulacion estadoEnum
+    );
+
+    /**
+     * Busca una postulación por su ID y el ID del estudiante para
+     * asegurar que le pertenece.
+     */
+    Optional<Postulacion> findByIdPostulacionAndEstudianteIdUsuario(Integer idPostulacion, Integer idEstudiante);
 }

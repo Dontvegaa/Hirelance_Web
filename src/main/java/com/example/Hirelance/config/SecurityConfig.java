@@ -44,7 +44,8 @@ public class SecurityConfig {
                                 "/img/**",        // Carpeta de imágenes (si usas otra)
                                 "/js/**",         // Tus archivos JavaScript
                                 "/css/**",        // Tus archivos CSS
-                                "/uploads/**"     // ¡IMPORTANTE! Para ver las fotos de perfil subidas
+                                "/uploads/**",
+                                "/downloads/**"// ¡IMPORTANTE! Para ver las fotos de perfil subidas
                         ).permitAll()
 
                         // --- PROTEGER TODAS LAS DEMÁS RUTAS ---

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${estudiante.nombre} + ' ' + ${estudiante.apellido} + ' - Hirelance'">Perfil de Estudiante</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-black text-white flex">
+
+<aside class="w-64 min-h-screen bg-gray-900 border-r border-gray-800 p-6">
+    <a href="/client/dashboard" class="text-2xl font-bold text-orange-500">Hirelance</a>
+    <nav class="mt-10">
+        <a href="/client/dashboard" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tachometer-alt w-6 mr-2"></i> Dashboard
+        </a>
+        <a href="/client/post-project" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-plus w-6 mr-2"></i> Publicar Proyecto
+        </a>
+        <a href="/client/my-projects" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tasks w-6 mr-2"></i> Mis Proyectos
+        </a>
+        <a href="/client/search-freelancer" class="block py-2 px-4 bg-orange-500 text-white rounded">
+            <i class="fas fa-search w-6 mr-2"></i> Buscar Talento
+        </a>
+        <a href="/client/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
+        </a>
+        <a href="/client/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-user w-6 mr-2"></i> Mi Perfil
+        </a>
+        <a href="/client/settings" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-cog w-6 mr-2"></i> Ajustes
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1">
+    <header class="bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center">
+        <div></div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition">Cerrar Sesión</button>
+        </form>
+    </header>
+
+    <div class="p-8">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <div class="lg:col-span-1 space-y-8">
+                <div class="bg-gray-800 border border-gray-700 rounded-lg p-8">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="flex-shrink-0">
+                            <img th:if="${!#strings.isEmpty(base64Photo)}" th:src="'data:image/png;base64,' + ${base64Photo}" alt="Foto" class="w-32 h-32 rounded-full bg-gray-700 object-cover border-4 border-gray-600">
+                            <div th:if="${#strings.isEmpty(base64Photo)}" class="w-32 h-32 rounded-full bg-gray-700 border-4 border-gray-600 flex items-center justify-center">
+                                <i class="fas fa-user-graduate text-6xl text-gray-500"></i>
+                            </div>
+                        </div>
+                        <h2 class="text-3xl font-bold text-white mt-4" th:text="${estudiante.nombre} + ' ' + ${estudiante.apellido}">
+                            Nombre del Estudiante
+                        </h2>
+                        <p class="text-lg text-orange-400 mt-1" th:if="${perfil?.carrera}" th:text="${perfil.carrera}">
+                            Carrera Universitaria
+                        </p>
+                    </div>
+
+                    <hr class="border-gray-700 my-6">
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-white mb-4">Habilidades</h3>
+                        <div th:if="${#lists.isEmpty(habilidades)}" class="text-gray-500 text-sm">
+                            <p>Este estudiante aún no ha añadido habilidades.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2" th:if="${!#lists.isEmpty(habilidades)}">
+                            <span th:each="hab : ${habilidades}"
+                                  class="bg-gray-700 text-gray-200 px-3 py-1 rounded-full text-sm"
+                                  th:text="${hab.titulo}">
+                                Habilidad
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 space-y-8">
+
+                <div class="bg-gray-800 border border-gray-700 rounded-lg p-8">
+                    <h3 class="text-2xl font-bold text-white mb-4">Acerca de Mí</h3>
+                    <p class="text-gray-300 whitespace-pre-wrap" th:if="${perfil?.descripcion}" th:text="${perfil.descripcion}">
+                        Descripción del estudiante...
+                    </p>
+                    <p class="text-gray-500" th:if="${perfil?.descripcion == null}">
+                        Este estudiante aún no ha añadido una descripción.
+                    </p>
+                </div>
+
+                <div class="bg-gray-800 border border-gray-700 rounded-lg p-8">
+                    <h3 class="text-2xl font-bold text-white mb-6">Educación</h3>
+
+                    <div th:if="${perfil?.carrera == null AND #lists.isEmpty(universidades)}" class="text-gray-500">
+                        <p>No hay información de educación registrada.</p>
+                    </div>
+
+                    <th:block th:each="uni : ${universidades}">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center mr-4">
+                                <i class="fas fa-university text-orange-400 text-xl"></i>
+                            </div>
+                            <span class="text-lg text-gray-200" th:text="${uni.nombre}">Universidad de El Salvador (UES)</span>
+                        </div>
+                    </th:block>
+
+                    <div class="mt-4" th:if="${perfil?.carrera}">
+                        <h4 class="text-lg font-semibold text-gray-300" th:text="${perfil.carrera}">Ingeniería en Ciencias de la Computación</h4>
+                        <p class="text-gray-400 mt-1" th:if="${perfil?.anioCarrera}">
+                            Cursando <span th:text="${perfil.anioCarrera} + 'º año'"></span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 border border-gray-700 rounded-lg p-8">
+                    <h3 class="text-2xl font-bold text-white mb-6">Información de Contacto</h3>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a th:href="@{/client/chat(with=${estudiante.idUsuario})}"
+                           class="flex-1 text-center bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-md transition">
+                            <i class="fas fa-envelope mr-2"></i> Contactar
+                        </a>
+                        <a th:if="${perfil?.portafolioUrl}" th:href="${perfil.portafolioUrl}" target="_blank"
+                           class="flex-1 text-center bg-gray-700 hover:bg-gray-600 text-white font-bold px-6 py-3 rounded-md transition">
+                            <i class="fas fa-link mr-2"></i> Ver Portafolio
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</main>
+<style>
+    /* Estilo para que la descripción respete saltos de línea */
+    .whitespace-pre-wrap {
+        white-space: pre-wrap;
+    }
+</style>
+</body>
+</html>

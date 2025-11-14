@@ -51,7 +51,53 @@
         <div th:if="${successMessage}" class="bg-green-900 border border-green-700 text-green-300 px-4 py-3 rounded-md mb-6" role="alert">
             <p th:text="${successMessage}"></p>
         </div>
+        <div th:if="${errorMessage}" class="bg-red-900 border border-red-700 text-red-300 px-4 py-3 rounded-md mb-6" role="alert">
+            <p th:text="${errorMessage}"></p>
+        </div>
 
+        <form th:action="@{/client/my-projects}" method="get" class="mb-6">
+            <div class="flex flex-wrap gap-4">
+                <div class="flex-1 min-w-[200px]">
+                    <label for="busqueda" class="text-xs text-gray-400">Buscar por título</label>
+                    <div class="relative">
+                        <input type="text" id="busqueda" name="busqueda" th:value="${busqueda}" placeholder="Título del proyecto..."
+                               class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <span class="absolute right-4 top-3.5 text-gray-500">
+                            <i class="fas fa-search"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex-1 min-w-[150px]">
+                    <label for="estado" class="text-xs text-gray-400">Estado</label>
+                    <select id="estado" name="estado" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 appearance-none">
+                        <option value="all" th:selected="${estado == 'all'}">Todos</option>
+                        <option value="publicado" th:selected="${estado == 'publicado'}">Publicado</option>
+                        <option value="en_progreso" th:selected="${estado == 'en_progreso'}">En Progreso</option>
+                        <option value="finalizado" th:selected="${estado == 'finalizado'}">Finalizado</option>
+                        <option value="cancelado" th:selected="${estado == 'cancelado'}">Cancelado</option>
+                    </select>
+                </div>
+
+                <div class="flex-1 min-w-[120px]">
+                    <label for="minBudget" class="text-xs text-gray-400">Presup. Mín ($)</label>
+                    <input type="number" id="minBudget" name="minBudget" th:value="${minBudget}" placeholder="Mín."
+                           class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                </div>
+
+                <div class="flex-1 min-w-[120px]">
+                    <label for="maxBudget" class="text-xs text-gray-400">Presup. Máx ($)</label>
+                    <input type="number" id="maxBudget" name="maxBudget" th:value="${maxBudget}" placeholder="Máx."
+                           class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                </div>
+
+                <div class="self-end">
+                    <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-md transition h-full">
+                        Filtrar
+                    </button>
+                </div>
+            </div>
+        </form>
         <div class="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden">
             <table class="min-w-full divide-y divide-gray-800">
                 <thead class="bg-gray-800">
@@ -59,7 +105,7 @@
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Proyecto</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Presupuesto</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha Límite</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Postulaciones</th>
                     <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
                 </tr>
                 </thead>
@@ -70,34 +116,54 @@
                         <span class="text-sm font-medium" th:text="${proyecto.titulo}">Título del Proyecto</span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                                <span th:text="${proyecto.estado.name()}"
-                                      th:classappend="${proyecto.estado.name() == 'publicado'} ? 'bg-green-700 text-green-300' :
-                                                     (${proyecto.estado.name() == 'en_progreso'} ? 'bg-blue-700 text-blue-300' :
-                                                     (${proyecto.estado.name() == 'finalizado'} ? 'bg-gray-700 text-gray-300' : 'bg-red-700 text-red-300'))"
-                                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                                    Estado
-                                </span>
+                        <span th:text="${#strings.capitalize(#strings.replace(proyecto.estado.name(), '_', ' '))}"
+                              th:classappend="${proyecto.estado.name() == 'publicado'} ? 'bg-green-700 text-green-300' :
+                                             (${proyecto.estado.name() == 'en_progreso'} ? 'bg-blue-700 text-blue-300' :
+                                             (${proyecto.estado.name() == 'finalizado'} ? 'bg-gray-700 text-gray-300' : 'bg-red-700 text-red-300'))"
+                              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                            Estado
+                        </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="text-sm text-gray-300" th:text="'$' + ${#numbers.formatDecimal(proyecto.presupuesto, 1, 2)}">$150.00</span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                        <span th:text="${#temporals.format(proyecto.fechaLimite, 'dd-MM-yyyy')}">15-12-2025</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a th:href="@{/client/project/{id}/applications(id=${proyecto.idProyecto})}" class="text-orange-500 hover:text-orange-400 mr-4">
+                        <a th:href="@{/client/project/{id}/applications(id=${proyecto.idProyecto})}" class="text-orange-500 hover:text-orange-400">
                             Ver Postulaciones
                         </a>
-                        <a href="#" class="text-gray-400 hover:text-white">Editar</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex items-center justify-end space-x-4">
+                            <th:block th:if="${proyecto.estado.name() == 'publicado'}">
+                                <a th:href="@{/client/project/{id}/edit(id=${proyecto.idProyecto})}" class="text-blue-400 hover:text-blue-300" title="Editar Proyecto">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </a>
+                                <form th:action="@{/client/project/{id}/delete(id=${proyecto.idProyecto})}" method="post"
+                                      onsubmit="return confirm('¿Estás seguro de que quieres ELIMINAR este proyecto? Esta acción no se puede deshacer.');"
+                                      class="inline">
+                                    <button type="submit" class="text-red-500 hover:text-red-400" title="Eliminar Proyecto">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </th:block>
+                            <th:block th:if="${proyecto.estado.name() != 'publicado'}">
+                                <span class="text-gray-600 cursor-not-allowed" title="No se puede editar un proyecto en progreso o finalizado">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </span>
+                                <span class="text-gray-600 cursor-not-allowed" title="No se puede eliminar un proyecto en progreso o finalizado">
+                                    <i class="fas fa-trash-alt"></i>
+                                </span>
+                            </th:block>
+                        </div>
                     </td>
                 </tr>
 
                 <tr th:if="${#lists.isEmpty(proyectos)}">
                     <td colspan="5" class="px-6 py-12 text-center">
                         <i class="fas fa-inbox text-4xl text-gray-600 mb-3"></i>
-                        <p class="text-gray-500">No has publicado ningún proyecto todavía.</p>
+                        <p class="text-gray-500">No se encontraron proyectos con esos filtros.</p>
                         <a href="/client/post-project" class="inline-block mt-4 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md transition">
-                            Publicar mi primer proyecto
+                            Publicar un nuevo proyecto
                         </a>
                     </td>
                 </tr>
