@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Contratista - Hirelance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#f97316',
+                        'secondary': '#000000',
+                        'accent': '#1f2937'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-secondary text-white">
+<header class="bg-secondary border-b border-gray-800">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center">
+            <a href="/" class="text-2xl font-bold text-primary"><img th:src="@{/img/Hirelance-Logo-grupo19.png.png}" class="h-24 w-29 " alt="Hirelance Logo"></a>
+        </div>
+        <nav class="hidden md:flex space-x-6">
+            <a href="/" class="hover:text-primary transition">Inicio</a>
+            <a href="/explore" class="hover:text-primary transition">Explorar</a>
+            <a href="#" class="hover:text-primary transition">Cómo funciona</a>
+        </nav>
+        <div class="flex items-center space-x-4">
+            <a href="/login" class="hover:text-primary transition">Iniciar Sesión</a>
+            <a href="/register" class="bg-primary hover:bg-orange-600 text-white px-4 py-2 rounded-md transition">Registrarse</a>
+        </div>
+    </div>
+</header>
+
+<section class="py-12">
+    <div class="container mx-auto px-4">
+        <div class="bg-accent rounded-lg border border-gray-800 p-8">
+            <div class="flex flex-col md:flex-row items-center md:items-start">
+                <div class="w-32 h-32 bg-primary rounded-full flex items-center justify-center mb-6 md:mb-0 md:mr-8">
+                    <i class="fas fa-building text-white text-5xl"></i>
+                </div>
+                <div class="flex-1 text-center md:text-left">
+                    <h1 class="text-3xl font-bold mb-2">TechSolutions Inc.</h1>
+                    <p class="text-xl text-primary mb-4">San Salvador, El Salvador</p>
+
+                    <div class="flex flex-wrap justify-center md:justify-start gap-2 mb-6">
+                        <span class="bg-secondary px-3 py-1 rounded-full text-sm">Desarrollo Web</span>
+                        <span class="bg-secondary px-3 py-1 rounded-full text-sm">Marketing Digital</span>
+                        <span class="bg-secondary px-3 py-1 rounded-full text-sm">Diseño UI/UX</span>
+                        <span class="bg-secondary px-3 py-1 rounded-full text-sm">Análisis de Datos</span>
+                    </div>
+
+                    <p class="text-gray-400 mb-6">Somos una agencia de desarrollo de software con 10 años en el mercado, enfocada en crear soluciones innovadoras. Siempre estamos en busca de talento estudiantil para unirse a nuestros proyectos.</p>
+
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button class="bg-primary hover:bg-orange-600 text-white px-6 py-3 rounded-md font-medium transition">Contactar</button>
+                        <a href="https://techsolutions.com" target="_blank" class="bg-secondary hover:bg-gray-800 border border-gray-700 text-white px-6 py-3 rounded-md font-medium transition text-center">
+                            Visitar Sitio Web
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-12">
+    <div class="container mx-auto px-4">
+        <h2 class="text-2xl font-bold mb-8">Proyectos Publicados Recientemente</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+            <div class="bg-accent p-6 rounded-lg border border-gray-800">
+                <h3 class="text-xl font-bold mb-2">Rediseño de Plataforma E-commerce</h3>
+                <p class="text-primary mb-2">Presupuesto: $2,500 - $4,000</p>
+                <p class="text-gray-400">Buscamos estudiantes de UI/UX y Desarrollo Front-End para un rediseño completo de nuestra tienda en línea.</p>
+            </div>
+
+            <div class="bg-accent p-6 rounded-lg border border-gray-800">
+                <h3 class="text-xl font-bold mb-2">Campaña de Marketing Digital (Q4)</h3>
+                <p class="text-primary mb-2">Presupuesto: $1,000 (Mensual)</p>
+                <p class="text-gray-400">Se necesita un equipo de estudiantes de marketing y diseño para gestionar nuestras redes sociales y campañas de anuncios.</p>
+            </div>
+
+            <div class="bg-accent p-6 rounded-lg border border-gray-800">
+                <h3 class="text-xl font-bold mb-2">Desarrollo de App Móvil (React Native)</h3>
+                <p class="text-primary mb-2">Presupuesto: $3,000 - $5,000</p>
+                <p class="text-gray-400">Proyecto para crear una aplicación de gestión de tareas. Se requiere experiencia en React Native y Firebase.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<footer class="bg-secondary border-t border-gray-800 py-8">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <a href="/" class="text-2xl font-bold text-primary"><img th:src="@{/img/Hirelance-Logo-grupo19.png.png}" class="h-24 w-29 " alt="Hirelance Logo"></a>
+                <p class="text-gray-400 mt-2">Conectando talento con oportunidades</p>
+            </div>
+            <div class="flex space-x-4">
+                <a href="#" class="text-gray-400 hover:text-primary transition">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-primary transition">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-primary transition">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-primary transition">
+                    <i class="fab fa-instagram"></i>
+                </a>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2025 Hirelance. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

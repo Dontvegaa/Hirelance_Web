@@ -1,0 +1,26 @@
+services:
+  # 1. El servicio de tu aplicación Spring Boot
+  app:
+    # Construye la imagen usando el Dockerfile en el directorio actual (.)
+    build: .
+    # Usa el nombre en minúsculas que elegiste
+    image: hirelance
+    container_name: hirelance
+    restart: on-failure
+
+    # Mapeo de puertos: 8080 de tu máquina -> 8000 del contenedor
+    ports:
+      - "8080:8000"
+
+    # ¡Tu configuración para la base de datos EXTERNA!
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://srv1999.hstgr.io/u825468745_hirelance_db
+      - SPRING_DATASOURCE_USERNAME=u825468745_hire
+      - SPRING_DATASOURCE_PASSWORD=Juas5378
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SERVER_PORT=8000
+    
+    # Volúmenes para persistir archivos subidos
+    volumes:
+      - ./uploads:/app/uploads
+      - ./downloads:/app/downloads

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Postulaciones - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-black text-white flex">
+
+<aside class="w-64 min-h-screen bg-gray-900 border-r border-gray-800 p-6">
+    <a href="/client/dashboard" class="text-2xl font-bold text-orange-500">Hirelance</a>
+    <nav class="mt-10">
+        <a href="/client/dashboard" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tachometer-alt w-6 mr-2"></i> Dashboard
+        </a>
+        <a href="/client/post-project" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-plus w-6 mr-2"></i> Publicar Proyecto
+        </a>
+        <a href="/client/my-projects" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tasks w-6 mr-2"></i> Mis Proyectos
+        </a>
+        <a href="/client/search-freelancer" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-search w-6 mr-2"></i> Buscar Talento
+        </a>
+        <a href="/client/chat" class="block py-2 px-4 bg-orange-500 text-white rounded">
+            <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
+        </a>
+        <a href="/client/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-user w-6 mr-2"></i> Mi Perfil
+        </a>
+        <a href="/client/settings" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-cog w-6 mr-2"></i> Ajustes
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1">
+    <header class="bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold">Postulaciones Recibidas</h1>
+            <p class="text-gray-400">Proyecto: <span class="text-orange-500" th:text="${proyecto.titulo}">Título del Proyecto</span></p>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition">
+                Cerrar Sesión
+            </button>
+        </form>
+    </header>
+
+    <div class="p-8">
+
+        <div th:if="${successMessage}" class="bg-green-900 border border-green-700 text-green-300 px-4 py-3 rounded-md mb-6" role="alert">
+            <p th:text="${successMessage}"></p>
+        </div>
+
+        <div th:if="${errorMessage}" class="bg-red-900 border border-red-700 text-red-300 px-4 py-3 rounded-md mb-6" role="alert">
+            <p th:text="${errorMessage}"></p>
+        </div>
+        <div th:if="${#lists.isEmpty(postulaciones)}" class="text-center py-12">
+            <i class="fas fa-user-clock text-6xl text-gray-600 mb-4"></i>
+            <h3 class="text-2xl font-bold text-gray-400">Aún no hay postulaciones</h3>
+            <p class="text-gray-500 mt-2">Todavía ningún estudiante se ha postulado a este proyecto.</p>
+            <a th:href="@{/client/my-projects}" class="inline-block mt-4 text-orange-500 hover:text-orange-400">
+                &larr; Volver a Mis Proyectos
+            </a>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(postulaciones)}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <div th:each="postulacion : ${postulaciones}" class="bg-gray-900 border border-gray-800 rounded-lg p-6 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user-graduate text-white text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="text-lg font-bold" th:text="${postulacion.estudiante.nombre} + ' ' + ${postulacion.estudiante.apellido}">Nombre del Estudiante</h4>
+                        </div>
+                    </div>
+
+                    <p class="text-sm text-gray-400 mb-4 italic" th:text="'&quot;' + ${postulacion.mensaje} + '&quot;'">
+                        "Mensaje de la postulación del estudiante..."
+                    </p>
+                </div>
+
+                <div th:if="${postulacion.estado.name() == 'pendiente'}" class="flex gap-4">
+                    <form th:action="@{/client/application/{id}/accept(id=${postulacion.idPostulacion})}" method="POST">
+                        <button type="submit" class="w-full text-center bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm transition">
+                            <i class="fas fa-check mr-1"></i> Aceptar
+                        </button>
+                    </form>
+                    <form th:action="@{/client/application/{id}/reject(id=${postulacion.idPostulacion})}" method="POST">
+                        <button type="submit" class="w-full text-center bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm transition">
+                            <i class="fas fa-times mr-1"></i> Rechazar
+                        </button>
+                    </form>
+                </div>
+
+                <div th:if="${postulacion.estado.name() == 'aceptada'}">
+                            <span class="w-full text-center px-4 py-2 rounded-md text-sm bg-green-700 text-green-300">
+                                <i class="fas fa-check-circle mr-1"></i> Aceptada
+                            </span>
+                </div>
+
+                <div th:if="${postulacion.estado.name() == 'rechazada'}">
+                            <span class="w-full text-center px-4 py-2 rounded-md text-sm bg-red-700 text-red-300">
+                                <i class="fas fa-times-circle mr-1"></i> Rechazada
+                            </span>
+                </div>
+            </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

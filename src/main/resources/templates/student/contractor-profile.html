@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${perfil != null ? perfil.empresa : (contratista.nombre + ' ' + contratista.apellido)} + ' - Hirelance'">Perfil de Contratista</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-black text-white flex">
+
+<aside class="w-64 min-h-screen bg-gray-900 border-r border-gray-800 p-6">
+    <a href="/student/dashboard" class="text-2xl font-bold text-orange-500">Hirelance</a>
+    <nav class="mt-10">
+        <a href="/student/dashboard" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tachometer-alt w-6 mr-2"></i> Dashboard
+        </a>
+        <a href="/student/search-projects" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-search w-6 mr-2"></i> Buscar Proyectos
+        </a>
+        <a href="/student/search-contractors" class="block py-2 px-4 bg-orange-500 text-white rounded">
+            <i class="fas fa-user-tie w-6 mr-2"></i> Buscar Contratistas
+        </a>
+        <a href="/student/my-applications" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-file-alt w-6 mr-2"></i> Mis Postulaciones
+        </a>
+        <a href="/student/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-user-graduate w-6 mr-2"></i> Mi Perfil
+        </a>
+        <a href="/student/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
+        </a>
+        <a href="/student/settings" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-cog w-6 mr-2"></i> Ajustes
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1">
+    <header class="bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Perfil de Contratista</h1>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition">Cerrar Sesión</button>
+        </form>
+    </header>
+
+    <div class="p-8">
+        <div class="max-w-6xl mx-auto">
+
+            <div class="bg-gray-800 border border-gray-700 rounded-lg p-8 mb-8">
+                <div class="flex flex-col sm:flex-row items-center">
+                    <div class="flex-shrink-0 mb-4 sm:mb-0 sm:mr-6">
+                        <img th:if="${!#strings.isEmpty(base64Logo)}" th:src="'data:image/png;base64,' + ${base64Logo}" alt="Logo" class="w-32 h-32 rounded-full bg-gray-700 object-cover border-4 border-gray-600">
+                        <div th:if="${#strings.isEmpty(base64Logo)}" class="w-32 h-32 rounded-full bg-gray-700 border-4 border-gray-600 flex items-center justify-center">
+                            <i class="fas fa-building text-6xl text-gray-500"></i>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 text-center sm:text-left">
+                        <h2 class="text-3xl font-bold text-white" th:text="${perfil?.empresa ?: (contratista.nombre + ' ' + contratista.apellido)}">
+                            Nombre de la Empresa
+                        </h2>
+                        <p class="text-lg text-gray-400 mt-1" th:if="${perfil?.ubicacion}" th:text="${perfil.ubicacion}">
+                            Ubicación
+                        </p>
+
+                        <div class="flex flex-wrap gap-2 mt-4 justify-center sm:justify-start">
+                            <span class="bg-gray-700 text-gray-200 px-3 py-1 rounded-full text-xs">Desarrollo Web</span>
+                            <span class="bg-gray-700 text-gray-200 px-3 py-1 rounded-full text-xs">Marketing Digital</span>
+                            <span class="bg-gray-700 text-gray-200 px-3 py-1 rounded-full text-xs">Diseño UI/UX</span>
+                        </div>
+
+                        <p class="text-gray-300 mt-4" th:text="${perfil?.descripcion}">
+                            Descripción de la empresa...
+                        </p>
+                    </div>
+
+                    <div class="flex-shrink-0 mt-6 sm:mt-0 sm:ml-8 flex flex-col space-y-3 w-full sm:w-auto">
+                        <a th:href="@{/student/chat(with=${contratista.idUsuario})}" class="w-full text-center bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-2 rounded-md transition">
+                            Contactar
+                        </a>
+                        <a th:if="${perfil?.sitioWeb}" th:href="${perfil.sitioWeb}" target="_blank" class="w-full text-center bg-gray-700 hover:bg-gray-600 text-white font-bold px-6 py-2 rounded-md transition">
+                            Visitar Sitio Web
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="text-2xl font-bold text-white mb-6">Proyectos Publicados Recientemente</h3>
+
+            <div th:if="${#lists.isEmpty(proyectos)}" class="text-center py-12 text-gray-500">
+                <i class="fas fa-inbox text-5xl mb-4"></i>
+                <p>Este contratista aún no ha publicado proyectos.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <th:block th:each="proyecto : ${proyectos}">
+                    <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden hover:border-orange-500 transition">
+                        <div class="p-6">
+                            <h4 class="text-xl font-bold mb-2 truncate" th:text="${proyecto.titulo}">Título del Proyecto</h4>
+                            <span class="text-orange-400 font-medium" th:text="'$' + ${#numbers.formatDecimal(proyecto.presupuesto, 1, 2)}">
+                                $1,000.00
+                            </span>
+                            <p class="text-gray-400 mt-3 text-sm line-clamp-3" th:text="${proyecto.descripcion}">
+                                Descripción del proyecto...
+                            </p>
+                            <div class="text-right mt-4">
+                                <a th:href="@{/student/project/{id}/apply(id=${proyecto.idProyecto})}"
+                                   class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm transition">
+                                    Ver Detalles
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+
+        </div>
+    </div>
+</main>
+<style>.line-clamp-3 {display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;}</style>
+</body>
+</html>

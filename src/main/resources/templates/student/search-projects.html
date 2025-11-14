@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Proyectos - Estudiante</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-black text-white flex">
+
+<aside class="w-64 min-h-screen bg-gray-900 border-r border-gray-800 p-6">
+    <a href="/student/dashboard" class="text-2xl font-bold text-orange-500">Hirelance</a>
+    <nav class="mt-10">
+        <a href="/student/dashboard" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tachometer-alt w-6 mr-2"></i> Dashboard
+        </a>
+        <a href="/student/search-projects" class="block py-2 px-4 bg-orange-500 text-white rounded">
+            <i class="fas fa-search w-6 mr-2"></i> Buscar Proyectos
+        </a>
+        <a href="/student/search-contractors" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-user-tie w-6 mr-2"></i> Buscar Contratistas
+        </a>
+        <a href="/student/my-applications" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-file-alt w-6 mr-2"></i> Mis Postulaciones
+        </a>
+        <a href="/student/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-user-graduate w-6 mr-2"></i> Mi Perfil
+        </a>
+        <a href="/student/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
+        </a>
+        <a href="/student/settings" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-cog w-6 mr-2"></i> Ajustes
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1">
+    <header class="bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Buscar Proyectos</h1>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition">Cerrar Sesión</button>
+        </form>
+    </header>
+
+    <div class="p-8">
+        <div class="max-w-3xl mx-auto relative mb-8">
+            <form th:action="@{/student/search-projects}" method="get">
+                <input type="hidden" name="categoria" th:value="${categoriaSeleccionada}">
+                <input type="text" name="busqueda" th:value="${busqueda}" placeholder="Buscar por título o palabra clave..."
+                       class="w-full px-6 py-4 bg-gray-800 border border-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500">
+                <button type="submit" class="absolute right-2 top-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-full transition">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+
+        <div class="flex flex-wrap gap-2 mb-8 justify-center">
+            <a th:href="@{/student/search-projects(categoria='all', busqueda=${busqueda})}"
+               th:class="${categoriaSeleccionada == 'all'} ? 'bg-orange-500 text-white' : 'bg-gray-700 hover:bg-gray-600 text-white'"
+               class="px-4 py-2 rounded-md text-sm transition">
+                Todos
+            </a>
+            <th:block th:each="cat : ${categorias}">
+                <a th:href="@{/student/search-projects(categoria=${cat.nombre}, busqueda=${busqueda})}"
+                   th:class="${categoriaSeleccionada == cat.nombre} ? 'bg-orange-500 text-white' : 'bg-gray-700 hover:bg-gray-600 text-white'"
+                   class="px-4 py-2 rounded-md text-sm transition"
+                   th:text="${cat.nombre}">
+                </a>
+            </th:block>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <th:block th:each="proyecto : ${proyectos}">
+                <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden hover:border-orange-500 transition">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2" th:text="${proyecto.titulo}">Título del Proyecto</h3>
+                        <p class="text-gray-400 mb-4 line-clamp-3" th:text="${proyecto.descripcion}">...</p>
+                        <span class="text-orange-500 font-medium" th:text="'$' + ${#numbers.formatDecimal(proyecto.presupuesto, 1, 2)}"></span>
+                        <div class="text-right mt-4">
+                            <a th:href="@{/student/project/{id}/apply(id=${proyecto.idProyecto})}"
+                               class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm transition">
+                                Ver detalles
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </th:block>
+            <th:block th:if="${#lists.isEmpty(proyectos)}">
+                <div class="col-span-3 text-center py-12">
+                    <i class="fas fa-inbox text-6xl text-gray-600 mb-4"></i>
+                    <h3 class="text-2xl font-bold text-gray-400">No se encontraron proyectos</h3>
+                    <p class="text-gray-500 mt-2">Intenta ajustar tu búsqueda o filtros.</p>
+                </div>
+            </th:block>
+        </div>
+    </div>
+</main>
+<style>.line-clamp-3 {display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;}</style>
+</body>
+</html>

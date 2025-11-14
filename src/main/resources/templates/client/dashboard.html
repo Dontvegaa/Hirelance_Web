@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Hirelance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-black text-white flex">
+
+<aside class="w-64 min-h-screen bg-gray-900 border-r border-gray-800 p-6">
+    <a href="/client/dashboard" class="text-2xl font-bold text-orange-500">Hirelance</a>
+    <nav class="mt-10">
+        <a href="/client/dashboard" class="block py-2 px-4 bg-orange-500 text-white rounded">
+            <i class="fas fa-tachometer-alt w-6 mr-2"></i> Dashboard
+        </a>
+        <a href="/client/post-project" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-plus w-6 mr-2"></i> Publicar Proyecto
+        </a>
+        <a href="/client/my-projects" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tasks w-6 mr-2"></i> Mis Proyectos
+        </a>
+        <a href="/client/search-freelancer" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-search w-6 mr-2"></i> Buscar Talento
+        </a>
+        <a href="/client/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
+        </a>
+        <a href="/client/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-user w-6 mr-2"></i> Mi Perfil
+        </a>
+        <a href="/client/settings" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-cog w-6 mr-2"></i> Ajustes
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1">
+    <header class="bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center">
+        <h1 class="text-2xl font-bold" th:text="'¡Bienvenido de nuevo, ' + ${nombreUsuario} + '!'">¡Bienvenido!</h1>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition">
+                <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+            </button>
+        </form>
+    </header>
+
+    <div class="p-8">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-orange-500 rounded-full">
+                        <i class="fas fa-tasks text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-400">Proyectos Totales</p>
+                        <p class="text-3xl font-bold" th:text="${totalProyectos}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-blue-500 rounded-full">
+                        <i class="fas fa-users text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-400">Postulaciones Totales</p>
+                        <p class="text-3xl font-bold" th:text="${totalPostulaciones}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-yellow-500 rounded-full">
+                        <i class="fas fa-clock text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-400">Pendientes de Revisión</p>
+                        <p class="text-3xl font-bold" th:text="${postulacionesPendientes}">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-6">
+                <h2 class="text-xl font-bold mb-4">Proyectos Recientes</h2>
+                <div class="space-y-4">
+                    <div th:if="${#lists.isEmpty(proyectosRecientes)}" class="text-gray-500 text-center py-4">
+                        Aún no has publicado proyectos.
+                    </div>
+                    <div th:each="proyecto : ${proyectosRecientes}" class="flex justify-between items-center bg-gray-800 p-4 rounded-lg">
+                        <div>
+                            <p class="text-white font-medium" th:text="${proyecto.titulo}">Título del Proyecto</p>
+                            <span th:text="${proyecto.estado.name()}"
+                                  th:classappend="${proyecto.estado.name() == 'publicado'} ? 'text-green-400' : 'text-gray-400'"
+                                  class="text-xs font-medium">Estado</span>
+                        </div>
+                        <a th:href="@{/client/project/{id}/applications(id=${proyecto.idProyecto})}" class="text-orange-500 hover:text-orange-400 text-sm">
+                            Ver Postulaciones
+                        </a>
+                    </div>
+                    <a href="/client/my-projects" class="text-orange-500 hover:text-orange-400 text-sm font-medium block text-center mt-4">
+                        Ver todos mis proyectos &rarr;
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-6">
+                <h2 class="text-xl font-bold mb-4">Postulaciones Recientes</h2>
+                <div class="space-y-4">
+                    <div th:if="${#lists.isEmpty(postulacionesRecientes)}" class="text-gray-500 text-center py-4">
+                        Aún no has recibido postulaciones.
+                    </div>
+                    <div th:each="post : ${postulacionesRecientes}" class="flex justify-between items-center bg-gray-800 p-4 rounded-lg">
+                        <div>
+                            <p class="text-white font-medium" th:text="${post.estudiante.nombre} + ' ' + ${post.estudiante.apellido}">Nombre Estudiante</p>
+                            <p class="text-xs text-gray-400" th:text="'Para: ' + ${post.proyecto.titulo}">Para: Título Proyecto</p>
+                        </div>
+                        <span th:text="${post.estado.name()}"
+                              th:classappend="${post.estado.name() == 'pendiente'} ? 'text-yellow-400' : (${post.estado.name() == 'aceptada'} ? 'text-green-400' : 'text-red-400')"
+                              class="text-sm font-medium">
+                                Pendiente
+                            </span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</main>
+
+</body>
+</html>

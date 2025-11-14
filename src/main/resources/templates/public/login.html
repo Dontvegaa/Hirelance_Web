@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Hirelance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#f97316',
+                        'secondary': '#000000',
+                        'accent': '#1f2937'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-secondary text-white">
+<header class="bg-secondary border-b border-gray-800">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center">
+            <a href="/" class="text-2xl font-bold text-primary"><img th:src="@{/img/Hirelance-Logo-grupo19.png.png}" class="h-24 w-29 " alt="Hirelance Logo"></a>
+        </div>
+        <div class="flex items-center space-x-4">
+            <a href="/login" class="hover:text-primary transition">Iniciar Sesión</a>
+            <a href="/register" class="bg-primary hover:bg-orange-600 text-white px-4 py-2 rounded-md transition">Registrarse</a>
+        </div>
+    </div>
+</header>
+
+<section class="min-h-screen flex items-center justify-center py-12 px-4">
+    <div class="max-w-md w-full bg-accent p-8 rounded-lg border border-gray-800">
+        <!-- MENSAJE DE ÉXITO DEL REGISTRO -->
+        <div th:if="${success}" class="bg-green-900 border border-green-700 text-green-300 px-4 py-3 rounded-md mb-6" role="alert">
+            <div class="flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span class="block sm:inline" th:text="${success}"></span>
+            </div>
+        </div>
+
+        <h2 class="text-3xl font-bold text-center mb-8">Iniciar Sesión</h2>
+
+        <form action="/login" method="POST">
+            <div class="mb-6">
+                <label for="email" class="block text-sm font-medium mb-2">Email</label>
+                <input type="email" id="email" name="username" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="example@correo.com" required>
+            </div>
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium mb-2">Contraseña</label>
+                <input type="password" id="password" name="password" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="••••••••" required>
+            </div>
+            <div class="mb-6 flex items-center justify-between">
+                <div class="flex items-center">
+                    <input type="checkbox" id="remember" name="remember-me" class="w-4 h-4 text-primary bg-secondary border-gray-700 rounded focus:ring-primary">
+                    <label for="remember" class="ml-2 text-sm">Recordarme</label>
+                </div>
+                <a href="#" class="text-sm text-primary hover:underline">¿Olvidaste tu contraseña?</a>
+            </div>
+            <button type="submit" class="w-full bg-primary hover:bg-orange-600 text-white py-3 rounded-md font-medium transition">Iniciar Sesión</button>
+        </form>
+        <div class="mt-6 text-center">
+            <p class="text-gray-400">¿No tienes una cuenta? <a href="/register" class="text-primary hover:underline">Regístrate</a></p>
+        </div>
+    </div>
+</section>
+
+<footer class="bg-secondary border-t border-gray-800 py-8">
+    <div class="container mx-auto px-4 text-center text-gray-400">
+        <p>&copy; 2025 Hirelance. Todos los derechos reservados.</p>
+    </div>
+</footer>
+</body>
+</html>

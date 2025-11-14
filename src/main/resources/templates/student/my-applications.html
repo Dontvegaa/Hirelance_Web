@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Postulaciones - Estudiante</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-black text-white flex">
+
+<aside class="w-64 min-h-screen bg-gray-900 border-r border-gray-800 p-6">
+    <a href="/student/dashboard" class="text-2xl font-bold text-orange-500">Hirelance</a>
+    <nav class="mt-10">
+        <a href="/student/dashboard" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tachometer-alt w-6 mr-2"></i> Dashboard
+        </a>
+        <a href="/student/search-projects" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-search w-6 mr-2"></i> Buscar Proyectos
+        </a>
+        <a href="/student/search-contractors" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-user-tie w-6 mr-2"></i> Buscar Contratistas
+        </a>
+        <a href="/student/my-applications" class="block py-2 px-4 bg-orange-500 text-white rounded">
+            <i class="fas fa-file-alt w-6 mr-2"></i> Mis Postulaciones
+        </a>
+        <a href="/student/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-user-graduate w-6 mr-2"></i> Mi Perfil
+        </a>
+        <a href="/student/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
+        </a>
+        <a href="/student/settings" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-cog w-6 mr-2"></i> Ajustes
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1">
+    <header class="bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Mis Postulaciones</h1>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition">
+                <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+            </button>
+        </form>
+    </header>
+
+    <div class="p-8">
+
+        <form th:action="@{/student/my-applications}" method="get" class="mb-6">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1 relative">
+                    <input type="text" name="busqueda" th:value="${busqueda}" placeholder="Buscar por título de proyecto..."
+                           class="w-full px-5 py-3 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <span class="absolute right-4 top-3 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </div>
+
+                <div class="w-full md:w-1/4">
+                    <select name="estado" class="w-full px-5 py-3 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 appearance-none">
+                        <option value="all" th:selected="${estado == 'all'}">Todos los estados</option>
+                        <option value="pendiente" th:selected="${estado == 'pendiente'}">Pendiente</option>
+                        <option value="aceptada" th:selected="${estado == 'aceptada'}">Aceptada</option>
+                        <option value="rechazada" th:selected="${estado == 'rechazada'}">Rechazada</button>
+                        <option value="cancelada" th:selected="${estado == 'cancelada'}">Cancelada</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-md transition">
+                    Filtrar
+                </button>
+            </div>
+        </form>
+
+        <div class="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-800">
+                <thead class="bg-gray-800">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Proyecto</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Mi Oferta</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Estado</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Fecha</th>
+                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Acciones</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-800">
+
+                <tr th:each="post : ${postulaciones}">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="text-sm font-medium" th:text="${post.proyecto.titulo}">Título del Proyecto</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="text-sm text-orange-500" th:text="'$' + ${#numbers.formatDecimal(post.presupuestoPropuesto, 1, 2)}">$120.00</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span th:text="${#strings.capitalize(post.estado.name())}"
+                              th:classappend="${post.estado.name() == 'aceptada'} ? 'bg-green-700 text-green-300' :
+                                             (${post.estado.name() == 'pendiente'} ? 'bg-yellow-700 text-yellow-300' :
+                                             (${post.estado.name() == 'cancelada'} ? 'bg-gray-600 text-gray-300' : 'bg-red-700 text-red-300'))"
+                              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                            Estado
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                        <span th:text="${#temporals.format(post.fechaPostulacion, 'dd-MM-yyyy')}">10-11-2025</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+
+                        <div class="flex items-center justify-end space-x-4">
+                            <a th:href="@{/student/project/{id}/apply(id=${post.proyecto.idProyecto})}" class="text-gray-400 hover:text-white" title="Ver Proyecto">
+                                <i class="fas fa-eye"></i>
+                            </a>
+
+                            <th:block th:if="${post.estado.name() == 'pendiente'}">
+                                <a th:href="@{/student/application/{id}/edit(id=${post.idPostulacion})}" class="text-blue-400 hover:text-blue-300" title="Editar Propuesta">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </a>
+
+                                <form th:action="@{/student/application/{id}/delete(id=${post.idPostulacion})}" method="post"
+                                      onsubmit="return confirm('¿Estás seguro de que quieres retirar esta postulación?');"
+                                      class="inline">
+                                    <button type="submit" class="text-red-500 hover:text-red-400" title="Retirar Postulación">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </th:block>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(postulaciones)}">
+                    <td colspan="5" class="px-6 py-12 text-center">
+                        <i class="fas fa-file-alt text-4xl text-gray-600 mb-3"></i>
+                        <p class="text-gray-500">No has enviado ninguna postulación todavía.</p>
+                        <a th:href="@{/student/search-projects}" class="inline-block mt-4 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md transition">
+                            Buscar mi primer proyecto
+                        </a>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajustes - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-black text-white flex">
+
+<aside class ="w-64 min-h-screen bg-gray-900 border-r border-gray-800 p-6">
+    <a href="/client/dashboard" class="text-2xl font-bold text-orange-500">Hirelance</a>
+    <nav class="mt-10">
+        <a href="/client/dashboard" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tachometer-alt w-6 mr-2"></i> Dashboard
+        </a>
+        <a href="/client/post-project" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-plus w-6 mr-2"></i> Publicar Proyecto
+        </a>
+        <a href="/client/my-projects" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tasks w-6 mr-2"></i> Mis Proyectos
+        </a>
+        <a href="/client/search-freelancer" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-search w-6 mr-2"></i> Buscar Talento
+        </a>
+        <a href="/client/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
+        </a>
+        <a href="/client/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-user w-6 mr-2"></i> Mi Perfil
+        </a>
+        <a href="/client/settings" class="block py-2 px-4 bg-orange-500 text-white rounded">
+            <i class="fas fa-cog w-6 mr-2"></i> Ajustes
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1">
+    <header class="bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Ajustes de Cuenta</h1>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition">
+                Cerrar Sesión
+            </button>
+        </form>
+    </header>
+
+    <div class="p-8">
+        <div class="max-w-xl mx-auto space-y-6">
+
+            <a th:href="@{/client/edit-profile}" class="flex items-center bg-gray-900 p-6 rounded-lg border border-gray-800 hover:border-orange-500 transition">
+                <div class="p-3 bg-gray-800 rounded-full">
+                    <i class="fas fa-user-edit text-orange-500 text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-lg font-bold">Editar Perfil</h2>
+                    <p class="text-gray-400 text-sm">Actualiza tu información de empresa, contacto y logo.</p>
+                </div>
+                <i class="fas fa-chevron-right text-gray-600 ml-auto"></i>
+            </a>
+
+            <a th:href="@{/client/change-password}" class="flex items-center bg-gray-900 p-6 rounded-lg border border-gray-800 hover:border-orange-500 transition">
+                <div class="p-3 bg-gray-800 rounded-full">
+                    <i class="fas fa-key text-orange-500 text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-lg font-bold">Cambiar Contraseña</h2>
+                    <p class="text-gray-400 text-sm">Actualiza la contraseña de tu cuenta por una nueva.</p>
+                </div>
+                <i class="fas fa-chevron-right text-gray-600 ml-auto"></i>
+            </a>
+
+        </div>
+    </div>
+</main>
+</body>
+</html>

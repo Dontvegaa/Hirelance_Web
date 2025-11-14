@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mensajes - Estudiante</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-black text-white flex">
+
+<aside class="w-64 min-h-screen bg-gray-900 border-r border-gray-800 p-6">
+    <a href="/student/dashboard" class="text-2xl font-bold text-orange-500">Hirelance</a>
+    <nav class="mt-10">
+        <a href="/student/dashboard" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tachometer-alt w-6 mr-2"></i> Dashboard
+        </a>
+        <a href="/student/search-projects" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-search w-6 mr-2"></i> Buscar Proyectos
+        </a>
+
+        <a href="/student/search-contractors" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-user-tie w-6 mr-2"></i> Buscar Contratistas
+        </a>
+        <a href="/student/my-applications" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-file-alt w-6 mr-2"></i> Mis Postulaciones
+        </a>
+        <a href="/student/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-user-graduate w-6 mr-2"></i> Mi Perfil
+        </a>
+        <a href="/student/chat" class="block py-2 px-4 bg-orange-500 text-white rounded">
+            <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
+        </a>
+        <a href="/student/settings" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-cog w-6 mr-2"></i> Ajustes
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1 flex flex-col h-screen">
+
+    <header class="bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Mensajería</h1>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition">
+                Cerrar Sesión
+            </button>
+        </form>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden">
+
+        <div class="w-1/3 bg-gray-900 border-r border-gray-800 overflow-y-auto">
+            <div class="p-4">
+                <input type="text" placeholder="Buscar contacto..." class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500">
+            </div>
+
+            <div class="flex items-center p-4 bg-gray-800 border-b border-gray-700 cursor-pointer">
+                <div class="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-building text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="font-bold">Empresa ACME (Contratista)</p>
+                    <p class="text-sm text-gray-400">Perfecto, ¿podrías enviar tu...</p>
+                </div>
+            </div>
+
+            <div class="flex items-center p-4 border-b border-gray-800 hover:bg-gray-800 cursor-pointer">
+                <div class="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-building text-white text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="font-bold">Diseños Creativos</p>
+                    <p class="text-sm text-gray-400">Gracias por tu postulación...</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="flex-1 flex flex-col">
+
+            <div class="bg-gray-900 p-4 border-b border-gray-800 flex items-center">
+                <div class="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-building text-white text-lg"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="font-bold">Empresa ACME</p>
+                    <p class="text-sm text-green-400">En línea</p>
+                </div>
+            </div>
+
+            <div class="flex-1 p-6 overflow-y-auto space-y-4">
+
+                <div class="flex justify-end">
+                    <div class="bg-orange-500 text-white p-3 rounded-lg max-w-xs">
+                        <p>¡Hola! Estoy muy interesado en el proyecto "Creación de logo". Adjunto mi portafolio.</p>
+                        <span class="text-xs text-orange-200 block text-right mt-1">10:30 AM</span>
+                    </div>
+                </div>
+
+                <div class="flex">
+                    <div class="bg-gray-800 p-3 rounded-lg max-w-xs">
+                        <p>Hola, gracias por escribir. Tu portafolio se ve excelente. ¿Cuándo podrías empezar?</p>
+                        <span class="text-xs text-gray-500 block text-right mt-1">10:32 AM</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="bg-gray-900 p-4 border-t border-gray-800">
+                <div class="flex items-center">
+                    <input type="text" placeholder="Escribe tu mensaje..." class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <button class="bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-full ml-3">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Estudiante - Hirelance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#f97316',
+                        'secondary': '#000000',
+                        'accent': '#1f2937'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-secondary text-white">
+<header class="bg-secondary border-b border-gray-800">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center">
+            <a href="/" class="text-2xl font-bold text-primary"><img th:src="@{/img/Hirelance-Logo-grupo19.png.png}" class="h-24 w-29 " alt="Hirelance Logo"></a>
+        </div>
+        <div class="flex items-center space-x-4">
+            <a href="/login" class="hover:text-primary transition">Iniciar Sesión</a>
+            <a href="/register" class="bg-primary hover:bg-orange-600 text-white px-4 py-2 rounded-md transition">Registrarse</a>
+        </div>
+    </div>
+</header>
+
+<section class="min-h-screen flex items-center justify-center py-12 px-4">
+    <div class="max-w-2xl w-full bg-accent p-8 rounded-lg border border-gray-800">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold">Registro para Estudiantes</h2>
+            <p class="text-gray-400 mt-2">Crea tu perfil para encontrar proyectos freelance</p>
+        </div>
+
+        <form action="/register-estudiante" th:object="${registerDTO}" method="POST" enctype="multipart/form-data">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="nombre" class="block text-sm font-medium mb-2">Nombre</label>
+                    <input type="text" id="nombre" th:field="*{nombre}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Tu nombre" required>
+                </div>
+                <div>
+                    <label for="apellido" class="block text-sm font-medium mb-2">Apellido</label>
+                    <input type="text" id="apellido" th:field="*{apellido}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Tu apellido" required>
+                </div>
+            </div>
+            <div class="mb-6">
+                <label for="email" class="block text-sm font-medium mb-2">Correo Electronico</label>
+                <input type="email" id="email" th:field="*{correo}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="example@correo.com" required>
+            </div>
+
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium mb-2">Contraseña</label>
+                <input type="password" id="password" th:field="*{contrasena}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="••••••••" required>
+            </div>
+            <div class="mb-6">
+                <label for="password-confirm" class="block text-sm font-medium mb-2">Confirmar Contraseña</label>
+                <input type="password" id="password-confirm" name="password-confirm" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="••••••••" required>
+            </div>
+
+            <div id="password-validation-box" class="hidden bg-gray-900 p-4 rounded-md border border-gray-700 mb-6 text-sm">
+                <h4 class="font-bold mb-3">La contraseña debe cumplir:</h4>
+                <ul class="space-y-2">
+                    <li id="val-letra" class="flex items-center text-red-500">
+                        <i class="fas fa-graduation-cap w-5 mr-2"></i>
+                        <span>Al menos una letra</span>
+                    </li>
+                    <li id="val-mayuscula" class="flex items-center text-red-500">
+                        <i class="fas fa-graduation-cap w-5 mr-2"></i>
+                        <span>Al menos una letra mayúscula</span>
+                    </li>
+                    <li id="val-numero" class="flex items-center text-red-500">
+                        <i class="fas fa-graduation-cap w-5 mr-2"></i>
+                        <span>Al menos un número</span>
+                    </li>
+                    <li id="val-longitud" class="flex items-center text-red-500">
+                        <i class="fas fa-graduation-cap w-5 mr-2"></i>
+                        <span>Al menos 8 caracteres</span>
+                    </li>
+                    <li id="val-espacios" class="flex items-center text-red-500">
+                        <i class="fas fa-graduation-cap w-5 mr-2"></i>
+                        <span>No debe tener espacios</span>
+                    </li>
+                    <li id="val-coincidir" class="flex items-center text-red-500">
+                        <i class="fas fa-graduation-cap w-5 mr-2"></i>
+                        <span>Las contraseñas deben cohincidir</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="mb-6">
+                <label for="telefono" class="block text-sm font-medium mb-2">Teléfono</label>
+                <input type="tel"
+                       id="telefono"
+                       th:field="*{telefono}"
+                       class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                       placeholder="+503 6059-8569"
+                       required>
+            </div>
+            <div class="mb-6">
+                <label for="dui" class="block text-sm font-medium mb-2">DUI</label>
+                <input type="text"
+                       id="dui"
+                       th:field="*{dui}"
+                       class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                       placeholder="06804213-9"
+                       required>
+            </div>
+            <!-- Cambia estos campos en la sección de Información Académica -->
+            <div class="border-t border-gray-700 pt-6 mb-6">
+                <h3 class="text-xl font-bold mb-4">Información Académica</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="universidad" class="block text-sm font-medium mb-2">Universidad</label>
+                        <input type="text" id="universidad" th:field="*{universidad}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Nombre de tu universidad">
+                    </div>
+                    <div>
+                        <label for="carrera" class="block text-sm font-medium mb-2">Carrera</label>
+                        <input type="text" id="carrera" th:field="*{carrera}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Tu carrera de estudio">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label for="anio_carrera" class="block text-sm font-medium mb-2">Año de carrera</label>
+                    <select id="anio_carrera" th:field="*{anioCarrera}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="">Selecciona tu año</option>
+                        <option value="1">Primer año</option>
+                        <option value="2">Segundo año</option>
+                        <option value="3">Tercer año</option>
+                        <option value="4">Cuarto año</option>
+                        <option value="5">Quinto año o más</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-6">
+                <label for="habilidades" class="block text-sm font-medium mb-2">Habilidades</label>
+                <textarea id="habilidades" th:field="*{habilidades}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" rows="3" placeholder="Ej: Diseño UI/UX, Desarrollo Web, Python, JavaScript..."></textarea>
+                <p class="text-sm text-gray-400 mt-1">Separa tus habilidades con comas</p>
+            </div>
+            <div class="mb-6">
+                <label for="descripcion" class="block text-sm font-medium mb-2">Descripción Personal</label>
+                <textarea id="descripcion" th:field="*{descripcion}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" rows="4" placeholder="Cuéntanos sobre ti, tus intereses y experiencia..."></textarea>
+            </div>
+            <div class="mb-6">
+                <label for="portafolio" class="block text-sm font-medium mb-2">URL de Portafolio</label>
+                <input type="url" id="portafolio" th:field="*{portafolioUrl}" class="w-full px-4 py-3 bg-secondary border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="https://tuportafolio.com">
+            </div>
+            <div class="mb-6">
+                <label for="foto_perfil" class="block text-sm font-medium mb-2">Foto de Perfil</label>
+                <input type="file" id="foto_perfil" name="foto_perfil" class="w-full px-3 py-2 bg-secondary border border-gray-700 rounded-md text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-orange-600">
+            </div>
+
+            <div class="mb-6">
+                <div class="flex items-center">
+                    <input type="checkbox" id="terms" name="terms" class="w-4 h-4 text-primary bg-secondary border-gray-700 rounded focus:ring-primary" required>
+                    <label for="terms" class="ml-2 text-sm">Acepto los <a href="#" class="text-primary hover:underline">Términos y Condiciones</a> y la <a href="#" class="text-primary hover:underline">Política de Privacidad</a></label>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-primary hover:bg-orange-600 text-white py-3 rounded-md font-medium transition">Registrarme como Estudiante</button>
+        </form>
+
+        <div class="mt-6 text-center">
+            <p class="text-gray-400">¿Eres un contratista? <a href="/register-contratista" class="text-primary hover:underline">Regístrate aquí</a></p>
+            <p class="text-gray-400 mt-2">¿Ya tienes una cuenta? <a href="/login" class="text-primary hover:underline">Inicia Sesión</a></p>
+        </div>
+    </div>
+</section>
+
+<footer class="bg-secondary border-t border-gray-800 py-8">
+    <div class="container mx-auto px-4 text-center text-gray-400">
+        <p>&copy; 2025 Hirelance. Todos los derechos reservados.</p>
+    </div>
+</footer>
+
+<script th:src="@{/js/register-validation.js}"></script>
+
+</body>
+</html>

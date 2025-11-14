@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Usuario - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-black text-white flex">
+
+<aside class="w-64 min-h-screen bg-gray-900 border-r border-gray-800 p-6">
+    <a href="/admin/dashboard" class="text-2xl font-bold text-orange-500">Hirelance (Admin)</a>
+    <nav class="mt-10">
+        <a th:href="@{/admin/dashboard}" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-shield-alt w-6 mr-2"></i> Dashboard
+        </a>
+        <a th:href="@{/admin/manage-users}" class="block py-2 px-4 bg-orange-500 text-white rounded">
+            <i class="fas fa-users-cog w-6 mr-2"></i> Gestionar Usuarios
+        </a>
+        <a th:href="@{/admin/manage-projects}" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-project-diagram w-6 mr-2"></i> Gestionar Proyectos
+        </a>
+        <a th:href="@{/admin/manage-universities}" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-university w-6 mr-2"></i> Gestionar Universidades
+        </a>
+        <a th:href="@{/admin/manage-categories}" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tags w-6 mr-2"></i> Gestionar Categorías
+        </a>
+        <a th:href="@{/admin/manage-reports}" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-flag w-6 mr-2"></i> Ver Reportes
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1 overflow-y-auto">
+    <header class="bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center">
+        <div>
+            <a th:href="@{/admin/manage-users}" class="text-sm text-orange-500 hover:underline">
+                &larr; Volver a Gestionar Usuarios
+            </a>
+            <h1 class="text-2xl font-bold" th:text="'Detalle de Usuario: ' + ${usuario.nombre}">Detalle de Usuario</h1>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition">
+                Cerrar Sesión
+            </button>
+        </form>
+    </header>
+
+    <div class="p-8">
+        <div class="max-w-6xl mx-auto bg-gray-900 rounded-lg border border-gray-800">
+
+            <div th:if="${usuario.tipo.name() == 'estudiante'}">
+                <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <div class="md:col-span-1 flex flex-col items-center">
+                        <div class="w-40 h-40 bg-gray-800 rounded-full flex items-center justify-center border-4 border-orange-500 mb-4">
+                            <img th:if="${base64Image != null}" th:src="'data:image/jpeg;base64,' + ${base64Image}" alt="Foto" class="w-full h-full object-cover rounded-full">
+                            <i th:if="${base64Image == null}" class="fas fa-user-graduate text-6xl text-gray-500"></i>
+                        </div>
+                        <div class="text-center mb-6">
+                            <h2 class="text-3xl font-bold" th:text="${usuario.nombre} + ' ' + ${usuario.apellido}"></h2>
+                            <p class="text-lg text-gray-400" th:text="${perfil?.carrera} ?: 'N/A'"></p>
+                        </div>
+                        <hr class="w-full border-gray-800 mb-6">
+                        <div class="w-full">
+                            <h3 class="text-xl font-bold mb-4 text-left">Habilidades</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <span th:each="hab : ${habilidades}" class="bg-gray-700 text-white px-4 py-2 rounded-full font-medium" th:text="${hab.titulo}"></span>
+                                <span th:if="${#lists.isEmpty(habilidades)}" class="text-gray-500 text-sm">Sin habilidades.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold mb-4">Acerca de Mí</h3>
+                            <div class="bg-gray-800 p-6 rounded-lg">
+                                <p class="text-gray-300" th:text="${perfil?.descripcion} ?: 'N/A'"></p>
+                            </div>
+                        </div>
+                        <hr class="border-gray-800 my-8">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-4">Educación</h3>
+                            <div th:each="uni : ${universidades}" class="flex items-center mb-4">
+                                <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center p-3 border-2 border-gray-700">
+                                    <i class="fas fa-university text-4xl text-orange-500"></i>
+                                </div>
+                                <p class="font-medium text-lg ml-4" th:text="${uni.nombre}"></p>
+                            </div>
+                            <div th:if="${#lists.isEmpty(universidades)}" class="text-gray-500 text-sm">Sin educación.</div>
+                        </div>
+
+                        <hr class="border-gray-800 my-8">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-4">Información de Contacto</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-gray-800 p-4 rounded-lg">
+                                    <p class="text-sm text-gray-400">Correo</p>
+                                    <p class="font-medium" th:text="${usuario.correo}"></p>
+                                </div>
+                                <div class="bg-gray-800 p-4 rounded-lg">
+                                    <p class="text-sm text-gray-400">Teléfono</p>
+                                    <p class="font-medium" th:text="${usuario.telefono}"></p>
+                                </div>
+                                <div class="bg-gray-800 p-4 rounded-lg md:col-span-2">
+                                    <p class="text-sm text-gray-400">Portafolio</p>
+                                    <a th:if="${perfil?.portafolioUrl != null and !perfil.portafolioUrl.isEmpty()}" th:href="${perfil.portafolioUrl}" target="_blank" class="font-medium text-orange-500 hover:underline" th:text="${perfil.portafolioUrl}"></a>
+                                    <p th:if="${perfil?.portafolioUrl == null or perfil.portafolioUrl.isEmpty()}" class="font-medium text-gray-500">No disponible</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="border-gray-800 my-8">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-4">Actividad del Usuario</h3>
+                            <div class="flex flex-wrap gap-4">
+                                <a th:href="@{/admin/users/{id}/applications(id=${usuario.idUsuario})}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg flex items-center">
+                                    <i class="fas fa-file-alt mr-2"></i>
+                                    Ver Postulaciones
+                                    <span class="ml-2 bg-blue-800 text-xs font-bold px-2 py-1 rounded-full" th:text="${#lists.size(postulaciones)}"></span>
+                                </a>
+                                <a th:href="@{/admin/users/{id}/reports(id=${usuario.idUsuario})}" class="bg-gray-600 hover:bg-gray-700 text-white px-5 py-3 rounded-lg flex items-center">
+                                    <i class="fas fa-flag mr-2"></i>
+                                    Ver Reportes
+                                    <span class="ml-2 bg-gray-800 text-xs font-bold px-2 py-1 rounded-full" th:text="${#lists.size(reportes)}"></span>
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${usuario.tipo.name() == 'contratista'}">
+                <div class="p-8 border-b border-gray-800">
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="w-32 h-32 bg-gray-800 rounded-lg flex items-center justify-center border border-gray-700 mb-4 md:mb-0">
+                            <img th:if="${base64Image != null}" th:src="'data:image/jpeg;base64,' + ${base64Image}" alt="Logo" class="w-full h-full object-cover rounded-lg">
+                            <i th:if="${base64Image == null}" class="fas fa-building text-5xl text-gray-500"></i>
+                        </div>
+                        <div class="md:ml-8 text-center md:text-left">
+                            <h2 class="text-3xl font-bold" th:text="${perfil?.empresa} ?: 'N/A'"></h2>
+                            <p class="text-lg text-gray-400" th:text="${usuario.nombre} + ' ' + ${usuario.apellido}"></p>
+                            <div th:if="${ubicacion != null}" class="text-orange-500 mt-2">
+                                <i class="fas fa-map-marker-alt mr-2"></i>
+                                <span th:text="${ubicacion.ciudad} + ', ' + ${ubicacion.departamento}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-8">
+                    <h3 class="text-xl font-bold mb-4">Acerca de la Empresa</h3>
+                    <p class="text-gray-300 mb-6" th:text="${perfil?.descripcion} ?: 'N/A'"></p>
+                    <hr class="border-gray-800 my-6">
+                    <h3 class="text-xl font-bold mb-4">Información de Contacto</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <p class="text-sm text-gray-400">Correo Electrónico</p>
+                            <p class="font-medium" th:text="${usuario.correo}">correo@empresa.com</p>
+                        </div>
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <p class="text-sm text-gray-400">Teléfono</p>
+                            <p class="font-medium" th:text="${usuario.telefono}">+503 XXXX-XXXX</p>
+                        </div>
+                        <div class="bg-gray-800 p-4 rounded-lg md:col-span-2">
+                            <p class="text-sm text-gray-400">Sitio Web</p>
+                            <a th:if="${perfil?.sitioWeb != null and !perfil.sitioWeb.isEmpty()}" th:href="${perfil.sitioWeb}" target="_blank" class="font-medium text-orange-500 hover:underline" th:text="${perfil.sitioWeb}">
+                                https://empresa.com
+                            </a>
+                            <p th:if="${perfil?.sitioWeb == null or perfil.sitioWeb.isEmpty()}" class="font-medium text-gray-500">No disponible</p>
+                        </div>
+                    </div>
+
+                    <hr class="border-gray-800 my-6">
+                    <h3 class="text-xl font-bold mb-4">Actividad del Usuario</h3>
+                    <div class="flex flex-wrap gap-4">
+                        <a th:href="@{/admin/users/{id}/projects(id=${usuario.idUsuario})}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg flex items-center">
+                            <i class="fas fa-tasks mr-2"></i>
+                            Ver Proyectos
+                            <span class="ml-2 bg-blue-800 text-xs font-bold px-2 py-1 rounded-full" th:text="${#lists.size(proyectos)}"></span>
+                        </a>
+                        <a th:href="@{/admin/users/{id}/reports(id=${usuario.idUsuario})}" class="bg-gray-600 hover:bg-gray-700 text-white px-5 py-3 rounded-lg flex items-center">
+                            <i class="fas fa-flag mr-2"></i>
+                            Ver Reportes
+                            <span class="ml-2 bg-gray-800 text-xs font-bold px-2 py-1 rounded-full" th:text="${#lists.size(reportes)}"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${usuario.tipo.name() == 'admin' or perfil == null}">
+                <div class="p-8 text-center">
+                    <h2 class="text-2xl font-bold" th:text="${usuario.nombre} + ' ' + ${usuario.apellido}"></h2>
+                    <p class="text-lg text-gray-400 capitalize" th:text="${usuario.tipo.name()}"></p>
+                    <p class="text-gray-500 mt-4">Este tipo de usuario no tiene un perfil visible.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+</body>
+</html>
