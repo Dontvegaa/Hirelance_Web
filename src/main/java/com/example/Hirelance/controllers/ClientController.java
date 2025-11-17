@@ -1,5 +1,6 @@
 package com.example.Hirelance.controllers;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.Hirelance.models.*;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid; // (Usaremos @Valid para validación futura)
 
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 
 import org.springframework.web.bind.annotation.PathVariable; // ¡NUEVO!
@@ -43,6 +46,12 @@ import com.example.Hirelance.config.CustomUserDetails;
 import com.example.Hirelance.models.Proyecto.EstadoProyecto;
 
 import java.util.stream.Collectors;
+import java.util.Base64;
+import com.example.Hirelance.models.Postulacion.EstadoPostulacion;
+import com.example.Hirelance.models.PerfilEstudiante;
+
+import com.example.Hirelance.dto.ValoracionDTO; // ¡NUEVO!
+import com.example.Hirelance.models.Proyecto.EstadoProyecto; // ¡NUEVO!
 
 @Controller
 @RequestMapping("/client") // Todas las URLs de este controlador empezarán con /client
@@ -73,6 +82,18 @@ public class ClientController {
 
     @Autowired
     private HabilidadRepository habilidadRepository;
+
+    @Autowired
+    private ValoracionRepository valoracionRepository;
+
+    @Autowired
+    private com.example.Hirelance.service.NotificacionService notificacionService;
+
+    @Autowired
+    private ContratoRepository contratoRepository;
+
+    @Autowired
+    private com.example.Hirelance.services.PdfService pdfService;
 
     private Map<String, List<String>> getDepartamentosMunicipios() {
         Map<String, List<String>> data = new java.util.TreeMap<>();
@@ -261,6 +282,214 @@ public class ClientController {
 
         return "client/my-projects";
     }
+
+    /**
+     * MUESTRA la página de detalles de un proyecto específico.
+     * ¡ACTUALIZADO para mostrar solo la postulación aceptada!
+     */
+    @GetMapping("/project/{id}/details")
+    public String showProjectDetails(
+            @PathVariable("id") Integer proyectoId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            // 1. Verificar propiedad y obtener proyecto
+            Proyecto proyecto = checkProjectOwnership(proyectoId, userDetails.getUsuario());
+
+            // 2. Cargar datos asociados
+
+            // Cargar TODAS las postulaciones (para encontrar la aceptada)
+            List<Postulacion> postulaciones = postulacionRepository
+                    .findAllByProyectoIdWithEstudiante(proyectoId);
+
+            // --- ¡CAMBIO AQUÍ! ---
+            // Buscar la postulación aceptada (si existe)
+            Postulacion postulacionAceptada = postulaciones.stream()
+                    .filter(p -> p.getEstado() == EstadoPostulacion.aceptada)
+                    .findFirst()
+                    .orElse(null);
+            // --- FIN DEL CAMBIO ---
+
+            // Cargar valoraciones (como antes)
+            List<Valoracion> valoraciones = valoracionRepository
+                    .findByProyectoIdWithEmisor(proyectoId);
+
+            // 3. Enviar todo a la nueva vista
+            model.addAttribute("proyecto", proyecto);
+            model.addAttribute("postulacionAceptada", postulacionAceptada); // <-- ¡MODIFICADO!
+            model.addAttribute("valoraciones", valoraciones);
+            // Ya no pasamos la lista 'postulaciones' completa
+
+            return "client/project-details";
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/client/my-projects";
+        }
+    }
+    /**
+     * MUESTRA el detalle de una postulación específica al CONTRATISTA.
+     * ¡ACTUALIZADO para manejar el formulario de valoración!
+     */
+    @GetMapping("/application/{id}/details")
+    public String showClientApplicationDetails(
+            @PathVariable("id") Integer postulacionId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            // 1. Buscar la postulación
+            Postulacion postulacion = postulacionRepository.findById(postulacionId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Postulación no encontrada"));
+
+            // 2. Verificar que el contratista sea el dueño del proyecto
+            checkProjectOwnership(postulacion.getProyecto().getIdProyecto(), userDetails.getUsuario());
+
+            // 3. Cargar datos del estudiante
+            Usuario estudiante = postulacion.getEstudiante();
+            PerfilEstudiante perfil = estudiante.getPerfilEstudiante();
+            String base64Photo = null;
+            if (perfil != null && perfil.getFotoPerfil() != null) {
+                base64Photo = Base64.getEncoder().encodeToString(perfil.getFotoPerfil());
+            }
+
+            // --- ¡NUEVO BLOQUE PARA VALORACIÓN! (Copiado de tu lógica anterior) ---
+            boolean haValorado = false;
+            boolean puedeValorar = false;
+            if (postulacion.getProyecto().getEstado() == EstadoProyecto.finalizado) {
+                puedeValorar = true;
+                haValorado = valoracionRepository
+                        .existsByEmisorIdUsuarioAndReceptorIdUsuarioAndProyectoIdProyecto(
+                                userDetails.getUsuario().getIdUsuario(),
+                                estudiante.getIdUsuario(),
+                                postulacion.getProyecto().getIdProyecto()
+                        );
+            }
+
+            // 4. Enviar datos a la vista
+            model.addAttribute("postulacion", postulacion);
+            model.addAttribute("estudiante", estudiante);
+            model.addAttribute("perfil", perfil);
+            model.addAttribute("base64Photo", base64Photo);
+
+            // --- ¡ESTA ES LA LÍNEA QUE FALTABA! ---
+            model.addAttribute("proyecto", postulacion.getProyecto());
+
+            // Datos para valoración
+            model.addAttribute("valoracionDTO", new ValoracionDTO());
+            model.addAttribute("puedeValorar", puedeValorar);
+            model.addAttribute("haValorado", haValorado);
+
+            return "client/application-details";
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/client/my-projects";
+        }
+    }
+
+    // =========================================================
+    // ¡NUEVO MÉTODO POST PARA LA VALORACIÓN DEL CONTRATISTA!
+    // =========================================================
+    /**
+     * Procesa el formulario de valoración del Contratista -> Estudiante.
+     */
+    @PostMapping("/application/{id}/review")
+    @Transactional
+    public String processClientReviewForm(
+            @PathVariable("id") Integer postulacionId,
+            @Valid @ModelAttribute("valoracionDTO") ValoracionDTO valoracionDTO,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes,
+            Model model) {
+
+        Usuario contratista = userDetails.getUsuario();
+        Postulacion postulacion = postulacionRepository.findById(postulacionId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Postulación no encontrada"));
+
+        try {
+            // 1. Verificar permisos
+            checkProjectOwnership(postulacion.getProyecto().getIdProyecto(), userDetails.getUsuario());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Acceso denegado.");
+            return "redirect:/client/my-projects";
+        }
+
+        // 2. Validar errores del formulario
+        if (bindingResult.hasErrors()) {
+            // Si hay errores, recargamos la página (copiamos la lógica del GET)
+            Usuario estudiante = postulacion.getEstudiante();
+            PerfilEstudiante perfil = estudiante.getPerfilEstudiante();
+            String base64Photo = null;
+            if (perfil != null && perfil.getFotoPerfil() != null) {
+                base64Photo = Base64.getEncoder().encodeToString(perfil.getFotoPerfil());
+            }
+
+            model.addAttribute("postulacion", postulacion);
+            model.addAttribute("estudiante", estudiante);
+            model.addAttribute("perfil", perfil);
+            model.addAttribute("base64Photo", base64Photo);
+            model.addAttribute("puedeValorar", true);
+            model.addAttribute("haValorado", false);
+            // El DTO con errores se pasa automáticamente
+
+            return "client/application-details";
+        }
+
+        // 3. Guardar la valoración
+        try {
+            Usuario estudiante = postulacion.getEstudiante();
+            Proyecto proyecto = postulacion.getProyecto();
+
+            // 4. Doble chequeo de que no haya valorado ya
+            boolean haValorado = valoracionRepository
+                    .existsByEmisorIdUsuarioAndReceptorIdUsuarioAndProyectoIdProyecto(
+                            contratista.getIdUsuario(),
+                            estudiante.getIdUsuario(),
+                            proyecto.getIdProyecto()
+                    );
+
+            if (haValorado) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Ya has enviado una valoración para este estudiante.");
+                return "redirect:/client/application/" + postulacionId + "/details";
+            }
+
+            Valoracion valoracion = new Valoracion();
+            valoracion.setEmisor(contratista); // El contratista es el emisor
+            valoracion.setReceptor(estudiante); // El estudiante es el receptor
+            valoracion.setProyecto(proyecto);
+            valoracion.setCalificacion(valoracionDTO.getCalificacion());
+            valoracion.setComentario(valoracionDTO.getComentario());
+
+            valoracionRepository.save(valoracion);
+
+            // --- NUEVO: NOTIFICAR AL CONTRATISTA ---
+            String mensaje = "¡Has recibido una nueva valoración de 5 estrellas de " + estudiante.getNombre() + "!";
+            // Opcional: Personalizar mensaje según estrellas:
+            // String mensaje = "¡" + estudiante.getNombre() + " te ha calificado con " + valoracionDTO.getCalificacion() + " estrellas!";
+
+            String urlDestino = "/client/profile"; // O "/client/my-projects"
+
+            notificacionService.crearNotificacion(
+                    proyecto.getContratista(), // Destinatario
+                    mensaje,
+                    Notificacion.TipoNotificacion.valoracion, // Asegúrate de tener este Enum o usa 'sistema'
+                    urlDestino
+            );
+
+            redirectAttributes.addFlashAttribute("successMessage", "¡Valoración enviada con éxito!");
+            return "redirect:/client/application/" + postulacionId + "/details";
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al guardar la valoración: " + e.getMessage());
+            return "redirect:/client/application/" + postulacionId + "/details";
+        }
+    }
+
     /**
      * Muestra el formulario para EDITAR un proyecto existente.
      * URL: /client/project/{id}/edit
@@ -399,6 +628,44 @@ public class ClientController {
     }
 
     /**
+     * ACTUALIZA el estado de un proyecto (ej: Publicado -> En Progreso).
+     * URL: /client/project/{id}/update-status
+     */
+    @PostMapping("/project/{id}/update-status")
+    @Transactional
+    public String updateProjectStatus(
+            @PathVariable("id") Integer proyectoId,
+            @RequestParam("estado") String nuevoEstado, // Recibe el estado del dropdown
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            // 1. Verificar que el proyecto le pertenece
+            Proyecto proyecto = checkProjectOwnership(proyectoId, userDetails.getUsuario());
+
+            // 2. Validar que no sea un estado final
+            if (proyecto.getEstado() == EstadoProyecto.finalizado || proyecto.getEstado() == EstadoProyecto.cancelado) {
+                throw new Exception("No se puede cambiar el estado de un proyecto que ya está finalizado o cancelado.");
+            }
+
+            // 3. Convertir el String a Enum
+            Proyecto.EstadoProyecto estadoEnum = Proyecto.EstadoProyecto.valueOf(nuevoEstado);
+
+            // 4. Asignar el nuevo estado y guardar
+            proyecto.setEstado(estadoEnum);
+            proyectoRepository.save(proyecto);
+
+            redirectAttributes.addFlashAttribute("successMessage", "¡Estado del proyecto actualizado con éxito!");
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al actualizar el estado: " + e.getMessage());
+        }
+
+        // 5. Redirigir de vuelta a la página de detalles
+        return "redirect:/client/project/" + proyectoId + "/details";
+    }
+
+    /**
      * Método de utilidad para verificar si un proyecto pertenece al
      * contratista logueado. Lanza una excepción si no es así.
      */
@@ -462,23 +729,46 @@ public class ClientController {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acceso denegado");
             }
 
-            // 3. Cambiar el estado y guardar
-            postulacion.setEstado(EstadoPostulacion.aceptada); //
+            // 3. Cambiar el estado de la postulación y guardar
+            postulacion.setEstado(EstadoPostulacion.aceptada);
             postulacionRepository.save(postulacion);
 
-            // (Opcional: podrías cambiar el estado del proyecto a "EN_PROGRESO" aquí)
-            // Proyecto proyecto = postulacion.getProyecto();
-            // proyecto.setEstado(Proyecto.EstadoProyecto.en_progreso);
-            // proyectoRepository.save(proyecto);
+            // 4. Actualizar estado del PROYECTO a 'en_progreso'
+            Proyecto proyecto = postulacion.getProyecto();
+            proyecto.setEstado(Proyecto.EstadoProyecto.en_progreso);
+            proyectoRepository.save(proyecto);
 
-            redirectAttributes.addFlashAttribute("successMessage", "¡Postulación aceptada exitosamente!");
+            // 5. CREAR CONTRATO AUTOMÁTICO
+            if (!contratoRepository.existsByProyectoIdProyecto(proyecto.getIdProyecto())) {
+                Contrato contrato = new Contrato();
+                contrato.setProyecto(proyecto);
+                contrato.setContratista(userDetails.getUsuario());
+                contrato.setEstudiante(postulacion.getEstudiante());
 
-            // 4. Redirigir de vuelta a la lista
-            return "redirect:/client/project/" + postulacion.getProyecto().getIdProyecto() + "/applications";
+                // Convertir Double a BigDecimal para el pago
+                contrato.setTotalPago(java.math.BigDecimal.valueOf(postulacion.getMontoOfertado()));
+
+                contratoRepository.save(contrato);
+            }
+
+            // 6. Notificar al estudiante (CON ENLACE A CONTRATOS)
+            String mensaje = "¡Felicidades! Se ha generado un contrato para el proyecto '" + proyecto.getTitulo() + "'.";
+            notificacionService.crearNotificacion(
+                    postulacion.getEstudiante(),
+                    mensaje,
+                    Notificacion.TipoNotificacion.proyecto,
+                    "/student/contracts" // Enlace a la lista de contratos
+            );
+
+            redirectAttributes.addFlashAttribute("successMessage", "¡Postulación aceptada y contrato generado exitosamente!");
+
+            // 7. Redirigir al detalle del proyecto
+            return "redirect:/client/project/" + proyecto.getIdProyecto() + "/details";
 
         } catch (Exception e) {
+            e.printStackTrace(); // Es bueno imprimir el error en consola para depurar
             redirectAttributes.addFlashAttribute("errorMessage", "Error: " + e.getMessage());
-            return "redirect:/client/my-projects"; // Redirigir a mis proyectos si algo sale muy mal
+            return "redirect:/client/my-projects";
         }
     }
 
@@ -515,6 +805,25 @@ public class ClientController {
             redirectAttributes.addFlashAttribute("errorMessage", "Error: " + e.getMessage());
             return "redirect:/client/my-projects";
         }
+    }
+
+    /**
+     * Muestra la lista de notificaciones del usuario.
+     */
+    @GetMapping("/notifications")
+    public String verNotificaciones(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        Usuario usuario = userDetails.getUsuario();
+
+        // 1. Obtener las notificaciones usando el servicio
+        // (Asegúrate de importar List y Notificacion)
+        List<Notificacion> lista = notificacionService.obtenerMisNotificaciones(usuario.getIdUsuario());
+
+        model.addAttribute("notificaciones", lista);
+
+        // Opcional: Si quieres marcarlas como leídas apenas entra a la página:
+        // lista.forEach(n -> notificacionService.marcarComoLeida(n.getIdNotificacion()));
+
+        return "client/notifications"; // Apunta al nuevo HTML
     }
     /**
      * Muestra la página de VISUALIZACIÓN del perfil del contratista.
@@ -799,6 +1108,7 @@ public class ClientController {
     /**
      * MUESTRA el perfil interno de un estudiante al contratista.
      * URL: /client/student-profile/{id}
+     * ¡ACTUALIZADO para incluir Valoraciones!
      */
     @GetMapping("/student-profile/{id}")
     public String showStudentProfileInternal(
@@ -807,7 +1117,6 @@ public class ClientController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         // 1. Buscar al estudiante con su perfil completo
-        //    (Usamos el método 'findByIdWithFullProfile' que ya debes tener en tu UsuarioRepository)
         Usuario estudiante = usuarioRepository.findByIdWithFullProfile(idEstudiante)
                 .orElseThrow(() -> new RuntimeException("Estudiante no encontrado"));
 
@@ -822,14 +1131,88 @@ public class ClientController {
             base64Photo = Base64.getEncoder().encodeToString(perfil.getFotoPerfil());
         }
 
-        // 4. Enviar todo al modelo
+        // --- ¡NUEVO PASO 4! ---
+        // 4. Buscar las valoraciones (reviews) que ha recibido el estudiante
+        //    (Asume que tu ValoracionRepository tiene este método)
+        List<Valoracion> valoraciones = valoracionRepository.findByReceptorIdWithEmisorAndProyecto(idEstudiante);
+
+        // 5. Enviar todo al modelo
         model.addAttribute("estudiante", estudiante);
         model.addAttribute("perfil", perfil);
         model.addAttribute("habilidades", habilidades);
         model.addAttribute("universidades", universidades);
         model.addAttribute("base64Photo", base64Photo);
+        model.addAttribute("valoraciones", valoraciones); // <-- ¡NUEVO!
 
-        // 5. Apuntar a la nueva plantilla HTML que crearemos
+        // 6. Apuntar a la plantilla
         return "client/student-profile";
     }
+
+    @GetMapping("/contracts")
+    public String showMyContracts(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        Usuario contratista = userDetails.getUsuario();
+        List<Contrato> contratos = contratoRepository.findByContratistaIdUsuarioOrderByFechaInicioDesc(contratista.getIdUsuario());
+        model.addAttribute("contratos", contratos);
+        return "client/my-contracts";
+    }
+
+    // Acción para Finalizar Contrato (Solo el cliente puede finalizarlo)
+    @PostMapping("/contract/{id}/complete")
+    public String completeContract(@PathVariable("id") Integer idContrato, RedirectAttributes redirectAttributes) {
+        Contrato contrato = contratoRepository.findById(idContrato).orElse(null);
+        if(contrato != null) {
+            contrato.setEstado(Contrato.EstadoContrato.completado);
+            contrato.setFechaFin(LocalDate.now());
+            contratoRepository.save(contrato);
+
+            // También finalizamos el proyecto
+            Proyecto p = contrato.getProyecto();
+            p.setEstado(Proyecto.EstadoProyecto.finalizado);
+            proyectoRepository.save(p);
+
+            // Notificar al estudiante
+            notificacionService.crearNotificacion(
+                    contrato.getEstudiante(),
+                    "El contrato de '" + p.getTitulo() + "' ha sido marcado como COMPLETADO.",
+                    Notificacion.TipoNotificacion.sistema,
+                    "/student/contracts"
+            );
+        }
+        redirectAttributes.addFlashAttribute("successMessage", "Contrato finalizado correctamente.");
+        return "redirect:/client/contracts";
+    }
+    @GetMapping("/contract/{id}/details")
+    public String viewContractDetails(@PathVariable("id") Integer contratoId,
+                                      @AuthenticationPrincipal CustomUserDetails userDetails,
+                                      Model model) {
+
+        // Buscar el contrato
+        Contrato contrato = contratoRepository.findById(contratoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contrato no encontrado"));
+
+        // Seguridad: Verificar que el contrato pertenezca al usuario logueado
+        if(!contrato.getContratista().getIdUsuario().equals(userDetails.getUsuario().getIdUsuario())){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para ver este contrato");
+        }
+
+        model.addAttribute("contrato", contrato);
+        return "client/contract-details";
+    }
+
+    @GetMapping("/contract/{id}/pdf")
+    public void downloadContractPdf(@PathVariable("id") Integer contratoId,
+                                    @AuthenticationPrincipal CustomUserDetails userDetails,
+                                    HttpServletResponse response) throws IOException {
+
+        Contrato contrato = contratoRepository.findById(contratoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        // Seguridad
+        if (!contrato.getContratista().getIdUsuario().equals(userDetails.getUsuario().getIdUsuario())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        pdfService.exportarContratoPdf(response, contrato);
+    }
+
 }

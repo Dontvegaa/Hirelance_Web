@@ -5,6 +5,7 @@ import com.example.Hirelance.dto.AdminUserEditDTO;
 import com.example.Hirelance.models.*;
 import com.example.Hirelance.repository.ProyectoRepository;
 import com.example.Hirelance.repository.UsuarioRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,6 +14,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.io.IOException;
 import java.util.List; // (Esta ya debería estar)
 
 
@@ -97,6 +100,9 @@ public class AdminController {
     @Autowired
     private ContratoRepository contratoRepository;
 
+
+    @Autowired
+    private com.example.Hirelance.services.PdfService pdfService; // Inyectar servicio
     /**
      * Muestra el dashboard principal del administrador.
      */
@@ -467,7 +473,6 @@ public class AdminController {
             @RequestParam(required = false) Double maxPropuesta,
             Model model) {
 
-        // ... (Validación de usuario - sin cambios)
         Usuario usuario = usuarioRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
         if (usuario.getTipo() != Usuario.TipoUsuario.estudiante) {
@@ -483,24 +488,21 @@ public class AdminController {
 
                 // --- ¡INICIO DE LA LÓGICA CORREGIDA! ---
                 .filter(p -> {
-                    // Si no se aplican filtros de presupuesto, la postulación pasa.
                     if (minPropuesta == null && maxPropuesta == null) {
                         return true;
                     }
-                    // Si se aplica un filtro pero la postulación no tiene presupuesto, no pasa.
-                    if (p.getPresupuestoPropuesto() == null) {
+                    // ¡USAR getMontoOfertado() EN LUGAR DE getPresupuestoPropuesto()!
+                    if (p.getMontoOfertado() == null) {
                         return false;
                     }
-                    // Comprobar los filtros de rango
-                    boolean minOk = (minPropuesta == null || p.getPresupuestoPropuesto() >= minPropuesta);
-                    boolean maxOk = (maxPropuesta == null || p.getPresupuestoPropuesto() <= maxPropuesta);
+                    boolean minOk = (minPropuesta == null || p.getMontoOfertado() >= minPropuesta);
+                    boolean maxOk = (maxPropuesta == null || p.getMontoOfertado() <= maxPropuesta);
                     return minOk && maxOk;
                 })
                 // --- FIN DE LA CORRECCIÓN ---
 
                 .collect(Collectors.toList());
 
-        // ... (Resto del método - sin cambios)
         model.addAttribute("usuario", usuario);
         model.addAttribute("postulaciones", postulacionesFiltradas);
         model.addAttribute("busqueda", busqueda);
@@ -1247,5 +1249,16 @@ public class AdminController {
 
         // Redirigir de vuelta a la página de detalles
         return "redirect:/admin/manage-reports/" + reporteId + "/details";
+    }
+
+    @GetMapping("/manage-contracts/{id}/pdf")
+    public void downloadContractPdf(@PathVariable("id") Integer contratoId,
+                                    HttpServletResponse response) throws IOException {
+
+        Contrato contrato = contratoRepository.findById(contratoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        // El admin puede descargar cualquiera, no requiere check de ID de usuario
+        pdfService.exportarContratoPdf(response, contrato);
     }
 }

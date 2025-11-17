@@ -2,20 +2,23 @@ package com.example.Hirelance.repository;
 
 import com.example.Hirelance.models.Contrato;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 import java.util.List;
 
-@Repository
 public interface ContratoRepository extends JpaRepository<Contrato, Integer> {
 
-    /**
-     * Busca TODOS los contratos y carga (FETCH) la información del proyecto,
-     * estudiante y contratista para el panel de admin.
-     */
-    @Query("SELECT c FROM Contrato c " +
-            "LEFT JOIN FETCH c.proyecto p " +
-            "LEFT JOIN FETCH c.estudiante e " +
-            "LEFT JOIN FETCH c.contratista co ")
+    // Contratos del Estudiante (ordenados por fecha inicio, más reciente primero)
+    List<Contrato> findByEstudianteIdUsuarioOrderByFechaInicioDesc(Integer idEstudiante);
+
+    // Contratos del Contratista
+    List<Contrato> findByContratistaIdUsuarioOrderByFechaInicioDesc(Integer idContratista);
+
+    // Verificar si ya existe contrato para un proyecto (para evitar duplicados)
+    boolean existsByProyectoIdProyecto(Integer idProyecto);
+
+    // Agrega esto dentro de public interface ContratoRepository ... {
+
+    @org.springframework.data.jpa.repository.Query("SELECT c FROM Contrato c LEFT JOIN FETCH c.proyecto LEFT JOIN FETCH c.estudiante LEFT JOIN FETCH c.contratista ORDER BY c.fechaInicio DESC")
     List<Contrato> findAllWithDetails();
+
+    // }
 }

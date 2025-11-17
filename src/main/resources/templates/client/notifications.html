@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Notificaciones - Hirelance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-black text-white flex">
+
+<aside class="w-64 min-h-screen bg-gray-900 border-r border-gray-800 p-6">
+    <a href="/client/dashboard" class="text-2xl font-bold text-orange-500">Hirelance</a>
+    <nav class="mt-10">
+        <a href="/client/dashboard" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tachometer-alt w-6 mr-2"></i> Dashboard
+        </a>
+        <a href="/client/post-project" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-plus w-6 mr-2"></i> Publicar Proyecto
+        </a>
+        <a href="/client/my-projects" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tasks w-6 mr-2"></i> Mis Proyectos
+        </a>
+
+        <a href="/client/contracts" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-file-contract w-6 mr-2"></i> Mis Contratos
+        </a>
+        <a href="/client/search-freelancer" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-search w-6 mr-2"></i> Buscar Talento
+        </a>
+        <a href="/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
+        </a>
+        <a href="/client/notifications" class="block py-2 px-4 bg-orange-500 text-white rounded items-center">
+            <div class="flex items-center">
+                <i class="fas fa-bell w-6 mr-2 group-hover:text-orange-400 transition"></i>
+                Notificaciones
+            </div>
+
+            <span th:if="${contadorNotificaciones > 0}"
+                  th:text="${contadorNotificaciones}"
+                  class="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">
+    </span>
+        </a>
+        <a href="/client/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-user w-6 mr-2"></i> Mi Perfil
+        </a>
+        <a href="/client/settings" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-cog w-6 mr-2"></i> Ajustes
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 border-b border-gray-800 pb-4">Notificaciones</h1>
+
+        <div th:if="${#lists.isEmpty(notificaciones)}" class="text-center text-gray-500 py-10">
+            <i class="fas fa-bell-slash text-6xl mb-4"></i>
+            <p class="text-xl">No tienes notificaciones nuevas.</p>
+        </div>
+
+        <div class="space-y-4">
+            <a th:each="notif : ${notificaciones}"
+               th:href="${notif.enlace != null} ? ${notif.enlace} : '#'"
+               class="block p-5 rounded-lg border transition flex items-start gap-4 relative group decoration-0"
+               th:classappend="${notif.leido} ? 'bg-gray-900 border-gray-800 text-gray-400' : 'bg-gray-800 border-orange-500/40 text-white hover:bg-gray-700 hover:border-orange-500'">
+
+                <div class="mt-1 p-2 rounded-full bg-gray-800 border border-gray-700 shrink-0">
+                    <span th:if="${notif.tipo.name() == 'proyecto'}" class="text-blue-400"><i class="fas fa-briefcase"></i></span>
+                    <span th:if="${notif.tipo.name() == 'mensaje'}" class="text-green-400"><i class="fas fa-envelope"></i></span>
+                    <span th:if="${notif.tipo.name() == 'valoracion'}" class="text-yellow-400"><i class="fas fa-star"></i></span>
+                    <span th:if="${notif.tipo.name() == 'sistema'}" class="text-gray-400"><i class="fas fa-info-circle"></i></span>
+                </div>
+
+                <div class="flex-1">
+                    <div class="flex justify-between items-start">
+                        <p class="font-medium text-sm mb-1"
+                           th:classappend="${!notif.leido} ? 'text-orange-400' : 'text-gray-500'"
+                           th:text="${#strings.capitalize(notif.tipo.name())}">Tipo</p>
+                        <span class="text-xs text-gray-600" th:text="${#temporals.format(notif.fecha, 'dd MMM, HH:mm')}">Fecha</span>
+                    </div>
+
+                    <p th:text="${notif.contenido}" class="leading-relaxed text-sm md:text-base"></p>
+
+                    <p th:if="${notif.enlace != null}" class="text-xs text-orange-500 mt-2 font-semibold">
+                        <i class="fas fa-external-link-alt mr-1"></i> Ver detalles
+                    </p>
+                </div>
+
+                <div th:if="${!notif.leido}" class="absolute top-5 right-5 h-2 w-2 bg-orange-500 rounded-full shadow-[0_0_10px_rgba(249,115,22,0.5)]"></div>
+            </a>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

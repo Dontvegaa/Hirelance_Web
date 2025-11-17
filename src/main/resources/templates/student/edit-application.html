@@ -24,11 +24,29 @@
         <a href="/student/my-applications" class="block py-2 px-4 bg-orange-500 text-white rounded">
             <i class="fas fa-file-alt w-6 mr-2"></i> Mis Postulaciones
         </a>
+        <a href="/student/contracts" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-file-contract w-6 mr-2"></i> Mis Contratos
+        </a>
         <a href="/student/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-user-graduate w-6 mr-2"></i> Mi Perfil
         </a>
-        <a href="/student/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+        <a href="/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
+        </a>
+        <a href="/student/notifications"
+           class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded flex justify-between items-center group transition">
+            <div class="flex items-center">
+                <i class="fas fa-bell w-6 mr-2 group-hover:text-orange-500 transition-colors"></i>
+                Notificaciones
+            </div>
+
+            <span th:if="${contadorNotificaciones > 0}"
+                  th:text="${contadorNotificaciones}"
+                  class="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm animate-pulse">
+    </span>
+        </a>
+        <a href="/student/report" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-bug w-6 mr-2"></i> reportar Problema
         </a>
         <a href="/student/settings" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-cog w-6 mr-2"></i> Ajustes
@@ -73,12 +91,22 @@
                         <span th:if="${#fields.hasErrors('propuesta')}" th:errors="*{propuesta}" class="text-red-400 text-sm mt-1"></span>
                     </div>
 
-                    <div class="mb-6">
-                        <label for="montoOfertado" class="block text-sm font-medium text-gray-300 mb-2">Tu Oferta ($)</label>
-                        <input type="number" id="montoOfertado" th:field="*{montoOfertado}" step="0.01" required
-                               class="w-full bg-gray-900 border border-gray-700 rounded-md p-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-                               placeholder="Ej: 850.00">
-                        <span th:if="${#fields.hasErrors('montoOfertado')}" th:errors="*{montoOfertado}" class="text-red-400 text-sm mt-1"></span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="mb-6">
+                            <label for="montoOfertado" class="block text-sm font-medium text-gray-300 mb-2">Tu Oferta ($)</label>
+                            <input type="number" id="montoOfertado" th:field="*{montoOfertado}" step="0.01" required
+                                   class="w-full bg-gray-900 border border-gray-700 rounded-md p-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                   placeholder="Ej: 850.00">
+                            <span th:if="${#fields.hasErrors('montoOfertado')}" th:errors="*{montoOfertado}" class="text-red-400 text-sm mt-1"></span>
+                        </div>
+
+                        <div class="mb-6">
+                            <label for="tiempoEstimado" class="block text-sm font-medium text-gray-300 mb-2">Tiempo Estimado</label>
+                            <input type="text" id="tiempoEstimado" th:field="*{tiempoEstimado}" required
+                                   class="w-full bg-gray-900 border border-gray-700 rounded-md p-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                   placeholder="Ej: 2 semanas, 1 mes">
+                            <span th:if="${#fields.hasErrors('tiempoEstimado')}" th:errors="*{tiempoEstimado}" class="text-red-400 text-sm mt-1"></span>
+                        </div>
                     </div>
 
                     <div class="flex items-center space-x-4">

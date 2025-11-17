@@ -28,6 +28,12 @@ public class PublicController {
     @Autowired
     private CategoriaRepository categoriaRepository;
 
+    @Autowired
+    private com.example.Hirelance.service.NotificacionService notificacionService; // ¡NUEVO!
+
+    @Autowired
+    private UsuarioRepository usuarioRepository; // ¡NUEVO!
+
     // ... (tus otros métodos GET como welcome, explore, login, etc.) ...
 
     @GetMapping("/")
@@ -169,34 +175,44 @@ public class PublicController {
                                             Model model,
                                             RedirectAttributes redirectAttributes) {
 
-        // Validar que las contraseñas coincidan
+        // 1. Validar contraseñas
         if (registerDTO.getContrasena() == null || !registerDTO.getContrasena().equals(passwordConfirm)) {
             model.addAttribute("error", "Las contraseñas no coinciden");
-            model.addAttribute("registerDTO", registerDTO); // Devolver datos al formulario
+            model.addAttribute("registerDTO", registerDTO);
             return "public/register-estudiante";
         }
 
-        // (Puedes añadir más validaciones de contraseña aquí si quieres)
-
         try {
-            // Llamar al servicio para hacer el trabajo
+            // 2. Registrar al estudiante (sin datos académicos por ahora)
             usuarioService.registrarEstudiante(registerDTO, fotoPerfil);
 
-            // Redirigir al login con mensaje de éxito
-            redirectAttributes.addFlashAttribute("success", "¡Registro exitoso! Ahora puedes iniciar sesión.");
+            // 3. Recuperar al usuario recién creado para enviarle la notificación
+            // (Lo buscamos por correo ya que es único)
+            Usuario nuevoEstudiante = usuarioRepository.findByCorreo(registerDTO.getCorreo())
+                    .orElseThrow(() -> new Exception("Error recuperando usuario registrado"));
+
+            // 4. Crear la notificación automática del Sistema
+            String mensaje = "¡Bienvenido a Hirelance! Por favor completa tu Perfil Académico y Habilidades para ser visible ante los contratistas.";
+            String urlDestino = "/student/edit-profile"; // <-- Redirige al formulario de actualización
+
+            notificacionService.crearNotificacion(
+                    nuevoEstudiante,
+                    mensaje,
+                    Notificacion.TipoNotificacion.sistema,
+                    urlDestino
+            );
+
+            // 5. Redirigir
+            redirectAttributes.addFlashAttribute("success", "¡Registro exitoso! Inicia sesión y revisa tus notificaciones.");
             return "redirect:/login";
 
         } catch (Exception e) {
-            // Manejar errores (ej: correo duplicado)
-            System.out.println("Error en registro: " + e.getMessage());
             e.printStackTrace();
-
             model.addAttribute("error", "Error en el registro: " + e.getMessage());
-            model.addAttribute("registerDTO", registerDTO); // Devolver datos al formulario
+            model.addAttribute("registerDTO", registerDTO);
             return "public/register-estudiante";
         }
     }
-
     @GetMapping("/register-contratista")
     public String registerContratista(Model model) {
         // Añadir el DTO al modelo si aún no existe
@@ -284,8 +300,6 @@ public class PublicController {
     @Autowired
     private ProyectoRepository proyectoRepository;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
 
 }
 

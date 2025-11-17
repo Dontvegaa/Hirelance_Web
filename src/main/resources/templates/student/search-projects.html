@@ -24,11 +24,29 @@
         <a href="/student/my-applications" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-file-alt w-6 mr-2"></i> Mis Postulaciones
         </a>
+        <a href="/student/contracts" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-file-contract w-6 mr-2"></i> Mis Contratos
+        </a>
         <a href="/student/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-user-graduate w-6 mr-2"></i> Mi Perfil
         </a>
-        <a href="/student/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+        <a href="/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
+        </a>
+        <a href="/student/notifications"
+           class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded flex justify-between items-center group transition">
+            <div class="flex items-center">
+                <i class="fas fa-bell w-6 mr-2 group-hover:text-orange-500 transition-colors"></i>
+                Notificaciones
+            </div>
+
+            <span th:if="${contadorNotificaciones > 0}"
+                  th:text="${contadorNotificaciones}"
+                  class="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm animate-pulse">
+    </span>
+        </a>
+        <a href="/student/report" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-bug w-6 mr-2"></i> reportar Problema
         </a>
         <a href="/student/settings" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-cog w-6 mr-2"></i> Ajustes

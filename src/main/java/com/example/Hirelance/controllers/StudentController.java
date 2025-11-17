@@ -3,24 +3,25 @@ package com.example.Hirelance.controllers;
 import com.example.Hirelance.config.CustomUserDetails;
 import com.example.Hirelance.dto.PostulacionDTO;
 import com.example.Hirelance.models.*;
-import com.example.Hirelance.repository.PostulacionRepository;
-import com.example.Hirelance.repository.UsuarioRepository;
+import com.example.Hirelance.repository.*;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.*;
 
 import com.example.Hirelance.dto.StudentProfileDTO; // ¡NUEVO!
-import com.example.Hirelance.repository.HabilidadRepository; // ¡NUEVO!
-import com.example.Hirelance.repository.UniversidadRepository; // ¡NUEVO!
-import com.example.Hirelance.repository.PerfilEstudianteRepository; // ¡NUEVO!
+
 import java.util.stream.Collectors; // ¡NUEVO!
 
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.validation.Valid;
@@ -30,13 +31,21 @@ import org.springframework.security.crypto.password.PasswordEncoder; // ¡NUEVO!
 
 import java.util.stream.Collectors; // (Esta ya debería estar)
 
-import com.example.Hirelance.repository.ProyectoRepository; // ¡NUEVO!
-import com.example.Hirelance.repository.CategoriaRepository; // ¡NUEVO!
-
 import java.time.LocalDateTime;
 
 import java.util.Optional;
 import com.example.Hirelance.models.Postulacion.EstadoPostulacion;
+
+import com.example.Hirelance.dto.ReporteDTO;
+import com.example.Hirelance.models.Reporte;
+import com.example.Hirelance.models.Valoracion;
+
+import java.util.Base64; // Asegúrate de que esta importación exista
+
+import com.example.Hirelance.models.Proyecto.EstadoProyecto;
+import com.example.Hirelance.models.Valoracion;
+import com.example.Hirelance.dto.ValoracionDTO;
+
 
 @Controller
 @RequestMapping("/student") // Todas las URLs de este controlador empezarán con /student
@@ -66,6 +75,18 @@ public class StudentController {
 
     @Autowired
     private CategoriaRepository categoriaRepository;
+    @Autowired
+    private ReporteRepository reporteRepository; // ¡Inyecta esto!
+
+    @Autowired
+    private ValoracionRepository valoracionRepository;
+    @Autowired
+    private com.example.Hirelance.service.NotificacionService notificacionService;
+
+    @Autowired
+    private com.example.Hirelance.services.PdfService pdfService; // Inyectar servicio
+
+
 
     private Map<String, List<String>> getDepartamentosMunicipios() {
         Map<String, List<String>> data = new TreeMap<>();
@@ -199,10 +220,12 @@ public class StudentController {
             return "redirect:/student/my-applications";
         }
 
-        // 3. Crear el DTO y poblarlo con los datos actuales
         PostulacionDTO dto = new PostulacionDTO();
-        dto.setPropuesta(postulacion.getMensaje()); // Usando 'getMensaje' de tu Postulacion.java
-        dto.setMontoOfertado(postulacion.getPresupuestoPropuesto()); // Usando 'getPresupuestoPropuesto' de tu Postulacion.java
+
+        // 3. Crear el DTO y poblarlo con los datos actuales
+        dto.setPropuesta(postulacion.getPropuesta());
+        dto.setMontoOfertado(postulacion.getMontoOfertado());
+        dto.setTiempoEstimado(postulacion.getTiempoEstimado()); // Usando 'getPresupuestoPropuesto' de tu Postulacion.java
 
         // 4. Enviar datos a la vista
         model.addAttribute("postulacionDTO", dto);
@@ -256,9 +279,9 @@ public class StudentController {
 
         // 4. Guardar los cambios
         try {
-            postulacion.setMensaje(postulacionDTO.getPropuesta()); // Usando 'setMensaje'
-            postulacion.setPresupuestoPropuesto(postulacionDTO.getMontoOfertado()); // Usando 'setPresupuestoPropuesto'
-            postulacion.setFechaPostulacion(LocalDateTime.now()); // Actualizar la fecha
+            postulacion.setPropuesta(postulacionDTO.getPropuesta());
+            postulacion.setMontoOfertado(postulacionDTO.getMontoOfertado());
+            postulacion.setTiempoEstimado(postulacionDTO.getTiempoEstimado());// Actualizar la fecha
 
             postulacionRepository.save(postulacion);
 
@@ -309,6 +332,61 @@ public class StudentController {
         }
 
         return "redirect:/student/my-applications";
+    }
+
+    /**
+     * MUESTRA los detalles de una postulación específica.
+     * URL: /student/application/{id}/details
+     */
+    @GetMapping("/application/{id}/details")
+    public String showApplicationDetails(
+            @PathVariable("id") Integer idPostulacion,
+            Model model,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
+
+        Usuario estudiante = userDetails.getUsuario();
+
+        // 1. Buscar la postulación
+        Optional<Postulacion> optPostulacion = postulacionRepository
+                .findByIdPostulacionAndEstudianteIdUsuario(idPostulacion, estudiante.getIdUsuario());
+
+        if (optPostulacion.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Postulación no encontrada.");
+            return "redirect:/student/my-applications";
+        }
+        Postulacion postulacion = optPostulacion.get();
+
+        // --- ¡NUEVA LÓGICA PARA VALORACIÓN! ---
+        boolean haValorado = false;
+        boolean puedeValorar = false;
+
+        // Solo se puede valorar si el proyecto está 'finalizado' y la postulación fue 'aceptada'
+        if (postulacion.getProyecto().getEstado() == EstadoProyecto.finalizado &&
+                postulacion.getEstado() == EstadoPostulacion.aceptada) {
+
+            puedeValorar = true;
+
+            // Comprobar si el estudiante (emisor) ya valoró al contratista (receptor)
+            haValorado = valoracionRepository
+                    .existsByEmisorIdUsuarioAndReceptorIdUsuarioAndProyectoIdProyecto(
+                            estudiante.getIdUsuario(),
+                            postulacion.getProyecto().getContratista().getIdUsuario(),
+                            postulacion.getProyecto().getIdProyecto()
+                    );
+        }
+        // --- FIN NUEVA LÓGICA ---
+
+        // 2. Enviar datos a la vista
+        model.addAttribute("postulacion", postulacion);
+        model.addAttribute("proyecto", postulacion.getProyecto()); // Por si acaso
+
+        // Datos para la valoración
+        model.addAttribute("valoracionDTO", new ValoracionDTO());
+        model.addAttribute("puedeValorar", puedeValorar);
+        model.addAttribute("haValorado", haValorado);
+
+        return "student/application-details";
     }
 
 
@@ -645,11 +723,11 @@ public class StudentController {
     }
     /**
      * MUESTRA la página de detalles del proyecto y el formulario para postularse.
-     * URL: /student/project/{id}/apply
+     * ¡ACTUALIZADO para manejar la postulación existente y el formulario de valoración!
      */
     @GetMapping("/project/{id}/apply")
     public String showApplyToProjectForm(
-            @PathVariable("id") Integer idProyecto,
+            @PathVariable("id") Integer idProyecto, // <-- Integer
             Model model,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
@@ -659,39 +737,101 @@ public class StudentController {
         Proyecto proyecto = proyectoRepository.findById(idProyecto)
                 .orElseThrow(() -> new RuntimeException("Proyecto no encontrado"));
 
-        // 2. Verificar si el estudiante ya se postuló
-        boolean yaPostulado = postulacionRepository
-                .existsByEstudianteIdUsuarioAndProyectoIdProyecto(estudiante.getIdUsuario(), idProyecto);
+        // 2. ¡CAMBIO! Buscar la postulación existente en lugar de solo comprobar si existe
+        Optional<Postulacion> optPostulacion = postulacionRepository
+                .findByEstudianteIdUsuarioAndProyectoIdProyecto(estudiante.getIdUsuario(), idProyecto);
 
-        // 3. Obtener el contratista (dueño del proyecto)
-        // Asumiendo que Proyecto tiene una relación directa a Usuario (contratista)
+        boolean yaPostulado = optPostulacion.isPresent();
+        Postulacion postulacion = optPostulacion.orElse(null); // Pasa la postulación si existe
+        boolean haValorado = false;
+
+        // 3. Comprobar si el estudiante ya ha valorado este proyecto
+// 3. Comprobar si el estudiante ya ha valorado este proyecto
+        if (yaPostulado && proyecto.getEstado() == EstadoProyecto.finalizado) {
+            haValorado = valoracionRepository
+                    .existsByEmisorIdUsuarioAndReceptorIdUsuarioAndProyectoIdProyecto(
+                            estudiante.getIdUsuario(), // Emisor (estudiante)
+                            proyecto.getContratista().getIdUsuario(), // Receptor (contratista)
+                            idProyecto // Proyecto
+                    );
+        }
+
+        // 4. Obtener el contratista (dueño del proyecto)
         Usuario contratista = proyecto.getContratista();
 
-        // 4. Preparar el logo del contratista (copiado de tu método searchContractors)
+        // 5. Preparar el logo del contratista
         String base64Logo = null;
         if (contratista != null && contratista.getPerfilContratista() != null && contratista.getPerfilContratista().getLogoEmpresa() != null) {
             base64Logo = Base64.getEncoder().encodeToString(contratista.getPerfilContratista().getLogoEmpresa());
         }
 
-        // 5. Enviar todos los datos a la vista
+        // 6. Enviar todos los datos a la vista
         model.addAttribute("proyecto", proyecto);
-        model.addAttribute("postulacionDTO", new PostulacionDTO()); // Para el formulario
+        model.addAttribute("postulacionDTO", new PostulacionDTO()); // Para el formulario de *postularse*
         model.addAttribute("yaPostulado", yaPostulado);
+        model.addAttribute("postulacion", postulacion); // ¡NUEVO! Pasa la postulación (o null)
         model.addAttribute("contratista", contratista);
         model.addAttribute("base64Logo", base64Logo);
+        model.addAttribute("valoracionDTO", new ValoracionDTO()); // ¡NUEVO! Para el formulario de *valoración*
+        model.addAttribute("haValorado", haValorado); // ¡NUEVO! Para saber si mostrar el form o no
+        model.addAttribute("proyecto", proyecto);
+        model.addAttribute("yaPostulado", yaPostulado);
+        model.addAttribute("postulacion", postulacion);
+        model.addAttribute("contratista", contratista);
+        model.addAttribute("base64Logo", base64Logo);
+        model.addAttribute("valoracionDTO", new ValoracionDTO());
+        model.addAttribute("haValorado", haValorado);
 
-        // 6. Apuntar al nuevo HTML que creamos
-        return "student/apply-to-project";
+        return "student/apply-to-project"; // Apunta a la vista de detalles
     }
+
+// ===============================================
+// ¡NUEVO MÉTODO GET PARA MOSTRAR EL FORMULARIO!
+// ===============================================
+/**
+ * MUESTRA el formulario de postulación dedicado.
+ */
+@GetMapping("/project/{id}/application")
+public String showApplicationForm(
+        @PathVariable("id") Integer idProyecto,
+        Model model,
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        RedirectAttributes redirectAttributes) {
+
+    Usuario estudiante = userDetails.getUsuario();
+    Proyecto proyecto = proyectoRepository.findById(idProyecto)
+            .orElseThrow(() -> new RuntimeException("Proyecto no encontrado"));
+
+    // Verificar si ya se postuló
+    boolean yaPostulado = postulacionRepository
+            .existsByEstudianteIdUsuarioAndProyectoIdProyecto(estudiante.getIdUsuario(), idProyecto);
+
+    if (yaPostulado) {
+        redirectAttributes.addFlashAttribute("errorMessage", "¡Ya te has postulado a este proyecto!");
+        return "redirect:/student/project/" + idProyecto + "/apply";
+    }
+
+    // Verificar si el proyecto sigue 'publicado'
+    if (proyecto.getEstado() != EstadoProyecto.publicado) {
+        redirectAttributes.addFlashAttribute("errorMessage", "Este proyecto ya no acepta postulaciones.");
+        return "redirect:/student/project/" + idProyecto + "/apply";
+    }
+
+    model.addAttribute("proyecto", proyecto);
+    model.addAttribute("postulacionDTO", new PostulacionDTO()); // DTO para el nuevo formulario
+
+    return "student/application-form"; // Apunta a la NUEVA plantilla de formulario
+}
+
 
     /**
      * PROCESA el formulario de postulación del estudiante.
-     * URL: /student/project/{id}/apply
+     * ¡ACTUALIZADO para usar los nombres de campo correctos de la DB!
      */
     @PostMapping("/project/{id}/apply")
     @Transactional
     public String processApplyToProject(
-            @PathVariable("id") Integer idProyecto,
+            @PathVariable("id") Integer idProyecto, // <-- Integer
             @Valid @ModelAttribute("postulacionDTO") PostulacionDTO postulacionDTO,
             BindingResult bindingResult,
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -702,7 +842,7 @@ public class StudentController {
         Proyecto proyecto = proyectoRepository.findById(idProyecto)
                 .orElseThrow(() -> new RuntimeException("Proyecto no encontrado"));
 
-        // 1. Validar duplicados (importante por si el usuario recarga la página)
+        // 1. Validar duplicados
         boolean yaPostulado = postulacionRepository
                 .existsByEstudianteIdUsuarioAndProyectoIdProyecto(estudiante.getIdUsuario(), idProyecto);
 
@@ -713,7 +853,80 @@ public class StudentController {
 
         // 2. Validar errores del formulario (DTO)
         if (bindingResult.hasErrors()) {
-            // Si hay errores, debemos recargar la página con los datos del GET
+            // Si hay errores, debemos recargar la página del formulario
+            model.addAttribute("proyecto", proyecto);
+            // El 'postulacionDTO' con errores se añade automáticamente
+            return "student/application-form";
+        }
+
+        // 3. Si todo está bien, creamos la postulación
+        try {
+            Postulacion nuevaPostulacion = new Postulacion();
+
+            // Usamos los nuevos nombres (que ahora sí existen en Postulacion.java)
+            nuevaPostulacion.setPropuesta(postulacionDTO.getPropuesta());
+            nuevaPostulacion.setMontoOfertado(postulacionDTO.getMontoOfertado());
+            nuevaPostulacion.setTiempoEstimado(postulacionDTO.getTiempoEstimado());
+
+            // CORRECCIÓN: Usar LocalDateTime (no Date)
+            nuevaPostulacion.setFechaPostulacion(java.time.LocalDateTime.now());
+
+            nuevaPostulacion.setEstado(Postulacion.EstadoPostulacion.pendiente);
+            nuevaPostulacion.setEstudiante(userDetails.getUsuario());
+            nuevaPostulacion.setProyecto(proyecto);
+
+            postulacionRepository.save(nuevaPostulacion);
+
+            // --- NOTIFICAR AL CONTRATISTA ---
+            String mensajeNotif = "Nueva postulación de " + estudiante.getNombre() + " en: " + proyecto.getTitulo();
+
+// URL: Lleva al contratista a ver el detalle de ESTA postulación
+            String urlDestino = "/client/application/" + nuevaPostulacion.getIdPostulacion() + "/details";
+
+            notificacionService.crearNotificacion(
+                    proyecto.getContratista(),
+                    mensajeNotif,
+                    Notificacion.TipoNotificacion.proyecto,
+                    urlDestino // <--- Pasamos la URL
+            );
+
+            redirectAttributes.addFlashAttribute("successMessage", "¡Postulación enviada con éxito!");
+            return "redirect:/student/my-applications"; // Enviar a "Mis Postulaciones"
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al procesar la postulación.");
+            return "redirect:/student/project/" + idProyecto + "/application";
+        }
+    }
+
+    // ===============================================
+    // ¡NUEVO MÉTODO PARA PROCESAR LA VALORACIÓN!
+    // ===============================================
+    /**
+     * Procesa el envío del formulario de valoración.
+     */
+    @PostMapping("/project/{id}/review")
+    @Transactional
+    public String processReviewForm(
+            @PathVariable("id") Integer idProyecto,
+            @Valid @ModelAttribute("valoracionDTO") ValoracionDTO valoracionDTO,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes,
+            Model model) {
+
+        Usuario estudiante = userDetails.getUsuario();
+        Proyecto proyecto = proyectoRepository.findById(idProyecto)
+                .orElseThrow(() -> new RuntimeException("Proyecto no encontrado"));
+
+        // 1. Validar errores del formulario
+        if (bindingResult.hasErrors()) {
+            // Si hay errores, debemos recargar la página completa
+            // (Reutilizamos la lógica del GET)
+            Postulacion postulacion = postulacionRepository
+                    .findByEstudianteIdUsuarioAndProyectoIdProyecto(estudiante.getIdUsuario(), idProyecto)
+                    .orElse(null);
+
             Usuario contratista = proyecto.getContratista();
             String base64Logo = null;
             if (contratista != null && contratista.getPerfilContratista() != null && contratista.getPerfilContratista().getLogoEmpresa() != null) {
@@ -721,38 +934,60 @@ public class StudentController {
             }
 
             model.addAttribute("proyecto", proyecto);
-            model.addAttribute("yaPostulado", false); // Aún no se ha postulado
+            model.addAttribute("postulacionDTO", new PostulacionDTO()); // Form de aplicar
+            model.addAttribute("yaPostulado", true);
+            model.addAttribute("postulacion", postulacion);
             model.addAttribute("contratista", contratista);
             model.addAttribute("base64Logo", base64Logo);
+            model.addAttribute("haValorado", false);
+            // El 'valoracionDTO' con errores se añade automáticamente por Spring
 
-            // Devolvemos la vista, no redirigimos, para mostrar los errores
-            return "student/apply-to-project";
+            return "student/apply-to-project"; // Devuelve la vista con los errores
         }
 
-        // 3. Si todo está bien, creamos la postulación
         try {
-            Postulacion nuevaPostulacion = new Postulacion();
+            // 2. Verificar que no haya valorado ya
+            boolean haValorado = valoracionRepository
+                    .existsByEmisorIdUsuarioAndReceptorIdUsuarioAndProyectoIdProyecto(
+                            estudiante.getIdUsuario(), // Emisor (estudiante)
+                            proyecto.getContratista().getIdUsuario(), // Receptor (contratista)
+                            idProyecto // Proyecto
+                    );
 
-            // --- ¡CORREGIDO! ---
-            // 'propuesta' (DTO) va a 'mensaje' (Entidad)
-            nuevaPostulacion.setMensaje(postulacionDTO.getPropuesta());
-            // 'montoOfertado' (DTO) va a 'presupuestoPropuesto' (Entidad)
-            nuevaPostulacion.setPresupuestoPropuesto(postulacionDTO.getMontoOfertado());
+            if (haValorado) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Ya has enviado una valoración para este proyecto.");
+                return "redirect:/student/project/" + idProyecto + "/apply";
+            }
 
-            nuevaPostulacion.setFechaPostulacion(java.time.LocalDateTime.now()); // <-- CORRECTO
-            nuevaPostulacion.setEstado(Postulacion.EstadoPostulacion.pendiente); // Estado inicial
-            nuevaPostulacion.setEstudiante(estudiante); // El estudiante logueado
-            nuevaPostulacion.setProyecto(proyecto); // El proyecto de la URL
+            // 3. Crear y guardar la valoración
+            Valoracion valoracion = new Valoracion();
+            valoracion.setEmisor(estudiante); // El estudiante es el emisor
+            valoracion.setReceptor(proyecto.getContratista()); // El contratista es el receptor
+            valoracion.setProyecto(proyecto);
+            valoracion.setCalificacion(valoracionDTO.getCalificacion());
+            valoracion.setComentario(valoracionDTO.getComentario());
 
-            postulacionRepository.save(nuevaPostulacion);
+            valoracionRepository.save(valoracion);
 
-            redirectAttributes.addFlashAttribute("successMessage", "¡Postulación enviada con éxito!");
-            // Redirigimos a la lista de "Mis Postulaciones"
-            return "redirect:/student/my-applications";
+            // --- NUEVO: NOTIFICAR AL CONTRATISTA ---
+            String mensaje = "¡Has recibido una nueva valoración de 5 estrellas de " + estudiante.getNombre() + "!";
+            // Opcional: Personalizar mensaje según estrellas:
+            // String mensaje = "¡" + estudiante.getNombre() + " te ha calificado con " + valoracionDTO.getCalificacion() + " estrellas!";
+
+            String urlDestino = "/client/profile"; // O "/client/my-projects"
+
+            notificacionService.crearNotificacion(
+                    proyecto.getContratista(), // Destinatario
+                    mensaje,
+                    Notificacion.TipoNotificacion.valoracion, // Asegúrate de tener este Enum o usa 'sistema'
+                    urlDestino
+            );
+
+            redirectAttributes.addFlashAttribute("successMessage", "¡Gracias por tu valoración!");
+            return "redirect:/student/project/" + idProyecto + "/apply";
 
         } catch (Exception e) {
-            // Manejo de errores inesperados
-            redirectAttributes.addFlashAttribute("errorMessage", "Error al procesar la postulación.");
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al guardar la valoración: " + e.getMessage());
             return "redirect:/student/project/" + idProyecto + "/apply";
         }
     }
@@ -760,6 +995,7 @@ public class StudentController {
     /**
      * MUESTRA el perfil interno de un contratista al estudiante.
      * URL: /student/contractor-profile/{id}
+     * ¡ACTUALIZADO para incluir Valoraciones!
      */
     @GetMapping("/contractor-profile/{id}")
     public String showContractorProfileInternal(
@@ -774,7 +1010,6 @@ public class StudentController {
         PerfilContratista perfil = contratista.getPerfilContratista();
 
         // 3. Buscar los proyectos de ese contratista
-        // (¡Asegúrate de tener este método en tu ProyectoRepository!)
         List<Proyecto> proyectos = proyectoRepository.findByContratistaIdUsuarioOrderByFechaCreacionDesc(idContratista);
 
         // 4. Preparar el logo
@@ -783,13 +1018,131 @@ public class StudentController {
             base64Logo = Base64.getEncoder().encodeToString(perfil.getLogoEmpresa());
         }
 
-        // 5. Enviar todo al modelo
+        // --- ¡NUEVO PASO 5! ---
+        // 5. Buscar las valoraciones (reviews)
+        List<Valoracion> valoraciones = valoracionRepository.findByReceptorIdWithEmisorAndProyecto(idContratista);
+
+
+        // 6. Enviar todo al modelo
         model.addAttribute("contratista", contratista);
         model.addAttribute("perfil", perfil);
         model.addAttribute("proyectos", proyectos);
         model.addAttribute("base64Logo", base64Logo);
+        model.addAttribute("valoraciones", valoraciones); // <-- ¡AÑADE ESTO!
 
-        // 6. Apuntar a la nueva plantilla HTML que crearemos
+        // 7. Apuntar a la plantilla HTML
         return "student/contractor-profile";
     }
+
+    /**
+     * Muestra el formulario para enviar un reporte.
+     */
+    @GetMapping("/report")
+    public String showReportForm(Model model) {
+        model.addAttribute("reporteDTO", new ReporteDTO());
+        return "student/report"; // Apunta a la nueva vista
+    }
+    /**
+     * Procesa el envío del reporte.
+     */
+    @PostMapping("/report")
+    @Transactional
+    public String processReportForm(
+            @Valid @ModelAttribute("reporteDTO") ReporteDTO reporteDTO,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            return "student/report";
+        }
+
+        try {
+            Usuario estudiante = userDetails.getUsuario();
+
+            Reporte nuevoReporte = new Reporte();
+            nuevoReporte.setUsuario(estudiante);
+            nuevoReporte.setDescripcion(reporteDTO.getDescripcion());
+
+            // Convertir el string del DTO al Enum del Modelo
+            // Asumiendo que Reporte.java tiene un enum TipoReporte
+            // Si da error, asegúrate de que los valores coinciden (bug, fraude, soporte, otro)
+            nuevoReporte.setTipo(Reporte.TipoReporte.valueOf(reporteDTO.getTipo()));
+
+            nuevoReporte.setEstado(Reporte.EstadoReporte.pendiente);
+            nuevoReporte.setFechaReporte(java.time.LocalDateTime.now());
+
+            reporteRepository.save(nuevoReporte);
+
+            redirectAttributes.addFlashAttribute("successMessage", "¡Tu reporte ha sido enviado. Gracias por tu feedback!");
+            return "redirect:/student/dashboard"; // O redirigir a donde prefieras
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al enviar el reporte: " + e.getMessage());
+            return "redirect:/student/report";
+        }
+    }
+
+    /**
+     * Muestra la lista de notificaciones del estudiante.
+     */
+    @GetMapping("/notifications")
+    public String showNotifications(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        Usuario usuario = userDetails.getUsuario();
+
+        // Obtener notificaciones (usando el servicio que ya creamos)
+        List<Notificacion> lista = notificacionService.obtenerMisNotificaciones(usuario.getIdUsuario());
+
+        model.addAttribute("notificaciones", lista);
+
+        // (Opcional) Marcar como leídas al entrar
+        // lista.forEach(n -> notificacionService.marcarComoLeida(n.getIdNotificacion()));
+
+        return "student/notifications"; // Apunta al nuevo HTML
+    }
+    @Autowired
+    private ContratoRepository contratoRepository; // Inyectar repositorio
+
+    @GetMapping("/contracts")
+    public String showMyContracts(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        Usuario estudiante = userDetails.getUsuario();
+        List<Contrato> contratos = contratoRepository.findByEstudianteIdUsuarioOrderByFechaInicioDesc(estudiante.getIdUsuario());
+        model.addAttribute("contratos", contratos);
+        return "student/my-contracts";
+    }
+
+    @GetMapping("/contract/{id}/details")
+    public String viewContractDetails(@PathVariable("id") Integer contratoId,
+                                      @AuthenticationPrincipal CustomUserDetails userDetails,
+                                      Model model) {
+
+        // 1. Buscar el contrato
+        Contrato contrato = contratoRepository.findById(contratoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Contrato no encontrado"));
+
+        // 2. Seguridad: Verificar que el contrato pertenezca al estudiante logueado
+        if(!contrato.getEstudiante().getIdUsuario().equals(userDetails.getUsuario().getIdUsuario())){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para ver este contrato");
+        }
+
+        model.addAttribute("contrato", contrato);
+        return "student/contract-details"; // Apunta al nuevo HTML
+    }
+
+    @GetMapping("/contract/{id}/pdf")
+    public void downloadContractPdf(@PathVariable("id") Integer contratoId,
+                                    @AuthenticationPrincipal CustomUserDetails userDetails,
+                                    HttpServletResponse response) throws IOException {
+
+        Contrato contrato = contratoRepository.findById(contratoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        // Seguridad
+        if (!contrato.getEstudiante().getIdUsuario().equals(userDetails.getUsuario().getIdUsuario())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        pdfService.exportarContratoPdf(response, contrato);
+    }
+
 }

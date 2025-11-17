@@ -21,11 +21,26 @@
         <a href="/client/my-projects" class="block py-2 px-4 bg-orange-500 text-white rounded">
             <i class="fas fa-tasks w-6 mr-2"></i> Mis Proyectos
         </a>
+        <a href="/client/contracts" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-file-contract w-6 mr-2"></i> Mis Contratos
+        </a>
         <a href="/client/search-freelancer" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-search w-6 mr-2"></i> Buscar Talento
         </a>
-        <a href="/client/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+        <a href="/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
+        </a>
+
+        <a href="/client/notifications" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded flex justify-between items-center group">
+            <div class="flex items-center">
+                <i class="fas fa-bell w-6 mr-2 group-hover:text-orange-400 transition"></i>
+                Notificaciones
+            </div>
+
+            <span th:if="${contadorNotificaciones > 0}"
+                  th:text="${contadorNotificaciones}"
+                  class="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">
+    </span>
         </a>
         <a href="/client/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-user w-6 mr-2"></i> Mi Perfil

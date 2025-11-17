@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Contratos - Hirelance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-black text-white flex">
+
+<aside class="w-64 min-h-screen bg-gray-900 border-r border-gray-800 p-6 flex-shrink-0 hidden md:block">
+    <a href="/client/dashboard" class="text-2xl font-bold text-orange-500">Hirelance</a>
+    <nav class="mt-10">
+        <a href="/client/dashboard" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tachometer-alt w-6 mr-2"></i> Dashboard
+        </a>
+        <a href="/client/post-project" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-plus w-6 mr-2"></i> Publicar Proyecto
+        </a>
+        <a href="/client/my-projects" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-tasks w-6 mr-2"></i> Mis Proyectos
+        </a>
+        <a href="/client/contracts" class="block py-2 px-4 bg-orange-500 text-white rounded">
+            <i class="fas fa-file-contract w-6 mr-2"></i> Contratos
+        </a>
+        <a href="/client/search-freelancer" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-search w-6 mr-2"></i> Buscar Talento
+        </a>
+        <a href="/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
+        </a>
+        <a href="/client/notifications" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded flex justify-between items-center group">
+            <div class="flex items-center">
+                <i class="fas fa-bell w-6 mr-2 group-hover:text-orange-400 transition"></i>
+                Notificaciones
+            </div>
+            <span th:if="${contadorNotificaciones > 0}"
+                  th:text="${contadorNotificaciones}"
+                  class="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">
+            </span>
+        </a>
+        <a href="/client/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-user w-6 mr-2"></i> Mi Perfil
+        </a>
+        <a href="/client/settings" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-cog w-6 mr-2"></i> Ajustes
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1 p-8">
+    <h1 class="text-3xl font-bold mb-8 border-b border-gray-800 pb-4">Gestión de Contratos</h1>
+
+    <div th:if="${#lists.isEmpty(contratos)}" class="text-center text-gray-500 py-12">
+        <i class="fas fa-file-signature text-6xl mb-4 opacity-50"></i>
+        <p class="text-xl">No tienes contratos activos actualmente.</p>
+        <a href="/client/my-projects" class="text-orange-500 hover:underline mt-2 block">Revisa tus proyectos para aceptar propuestas.</a>
+    </div>
+
+    <div class="grid gap-6">
+        <div th:each="contrato : ${contratos}"
+             class="bg-gray-800 border border-gray-700 rounded-lg p-6 relative overflow-hidden transition hover:border-orange-500">
+
+            <div class="absolute top-0 left-0 w-2 h-full"
+                 th:classappend="${contrato.estado.name() == 'activo'} ? 'bg-green-500' :
+                                (${contrato.estado.name() == 'completado'} ? 'bg-blue-500' : 'bg-red-500')">
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center pl-4">
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-1">
+                        <a th:href="@{/client/project/{id}/details(id=${contrato.proyecto.idProyecto})}" class="hover:text-orange-500 transition">
+                            <i class="fas fa-briefcase mr-2 text-gray-500"></i>
+                            <span th:text="${contrato.proyecto.titulo}">Nombre Proyecto</span>
+                        </a>
+                    </h3>
+                    <div class="text-gray-400 text-sm space-y-1 mt-2">
+                        <p class="flex items-center">
+                            <i class="fas fa-user-graduate w-6 mr-2 text-center"></i>
+                            <span>Freelancer: </span>
+                            <span class="text-white ml-1 font-medium"
+                                  th:text="${contrato.estudiante.nombre} + ' ' + ${contrato.estudiante.apellido}">Nombre</span>
+                        </p>
+                        <p class="flex items-center">
+                            <i class="fas fa-calendar-alt w-6 mr-2 text-center"></i>
+                            <span>Iniciado el: </span>
+                            <span class="ml-1" th:text="${#temporals.format(contrato.fechaInicio, 'dd MMMM yyyy')}">Fecha</span>
+                        </p>
+                        <p th:if="${contrato.fechaFin}" class="flex items-center text-blue-400">
+                            <i class="fas fa-check-circle w-6 mr-2 text-center"></i>
+                            <span>Finalizado el: </span>
+                            <span class="ml-1" th:text="${#temporals.format(contrato.fechaFin, 'dd MMMM yyyy')}">Fecha Fin</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-6 md:mt-0 text-right flex flex-col items-end">
+                    <p class="text-3xl font-bold text-white mb-2">
+                        <span class="text-lg text-gray-500 font-normal mr-1">$</span><span th:text="${contrato.totalPago}">0.00</span>
+                    </p>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
+                          th:classappend="${contrato.estado.name() == 'activo'} ? 'bg-green-900/50 text-green-400 border border-green-700' :
+                                         (${contrato.estado.name() == 'completado'} ? 'bg-blue-900/50 text-blue-400 border border-blue-700' : 'bg-red-900/50 text-red-400 border border-red-700')"
+                          th:text="${contrato.estado}">ACTIVO</span>
+                </div>
+            </div>
+
+            <div class="mt-6 border-t border-gray-700 pt-4 flex justify-between items-center">
+
+                <div class="flex space-x-4">
+                    <a th:href="@{/chat/{id}(id=${contrato.estudiante.idUsuario})}"
+                       class="text-gray-400 hover:text-white text-sm flex items-center transition">
+                        <i class="fas fa-comment-dots mr-2 text-orange-500"></i> Chat
+                    </a>
+
+                    <a th:href="@{/client/contract/{id}/details(id=${contrato.idContrato})}"
+                       class="text-gray-400 hover:text-white text-sm flex items-center transition">
+                        <i class="fas fa-file-contract mr-2 text-blue-500"></i> Ver Detalles
+                    </a>
+                </div>
+
+                <div th:if="${contrato.estado.name() == 'activo'}">
+                    <form th:action="@{/client/contract/{id}/complete(id=${contrato.idContrato})}" method="post"
+                          onsubmit="return confirm('¿Confirmas que el trabajo ha sido entregado? Al finalizar el contrato, podrás calificar al estudiante.');">
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md text-sm font-bold transition shadow-lg flex items-center">
+                            <i class="fas fa-check mr-2"></i> Finalizar
+                        </button>
+                    </form>
+                </div>
+
+                <div th:if="${contrato.estado.name() == 'completado'}">
+                    <a th:href="@{/client/project/{id}/details(id=${contrato.proyecto.idProyecto})}"
+                       class="text-blue-400 hover:text-blue-300 text-sm font-semibold">
+                        Proyecto &rarr;
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+</body>
+</html>

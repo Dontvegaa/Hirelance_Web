@@ -11,25 +11,22 @@ public class PostulacionDTO {
     @Size(min = 10, message = "La propuesta debe tener al menos 10 caracteres.")
     private String propuesta;
 
-    // Quita la validación @NotNull si quieres que este campo sea opcional
     @NotNull(message = "Debes ingresar un monto.")
     @Positive(message = "El monto ofertado debe ser positivo.")
     private Double montoOfertado;
 
+    // --- ¡AÑADIDO! ---
+    @NotEmpty(message = "Debes proveer un tiempo estimado.")
+    private String tiempoEstimado;
+
     // Getters y Setters
-    public String getPropuesta() {
-        return propuesta;
-    }
+    public String getPropuesta() { return propuesta; }
+    public void setPropuesta(String propuesta) { this.propuesta = propuesta; }
 
-    public void setPropuesta(String propuesta) {
-        this.propuesta = propuesta;
-    }
+    public Double getMontoOfertado() { return montoOfertado; }
+    public void setMontoOfertado(Double montoOfertado) { this.montoOfertado = montoOfertado; }
 
-    public Double getMontoOfertado() {
-        return montoOfertado;
-    }
-
-    public void setMontoOfertado(Double montoOfertado) {
-        this.montoOfertado = montoOfertado;
-    }
+    // --- ¡AÑADIDO! ---
+    public String getTiempoEstimado() { return tiempoEstimado; }
+    public void setTiempoEstimado(String tiempoEstimado) { this.tiempoEstimado = tiempoEstimado; }
 }

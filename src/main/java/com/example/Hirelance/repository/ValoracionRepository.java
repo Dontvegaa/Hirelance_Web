@@ -3,6 +3,7 @@ package com.example.Hirelance.repository;
 import com.example.Hirelance.models.Valoracion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
@@ -18,4 +19,30 @@ public interface ValoracionRepository extends JpaRepository<Valoracion, Integer>
             "LEFT JOIN FETCH v.receptor " +
             "LEFT JOIN FETCH v.proyecto")
     List<Valoracion> findAllWithDetails();
+
+    /**
+     * Busca todas las valoraciones de un receptor (contratista)
+     * e incluye (FETCH) la info del emisor (estudiante) para
+     * poder mostrar el nombre del que escribió la reseña.
+     */
+    @Query("SELECT v FROM Valoracion v " +
+            "JOIN FETCH v.emisor e " +
+            "JOIN FETCH v.proyecto p " +
+            "WHERE v.receptor.idUsuario = :idReceptor " +
+            "ORDER BY v.fecha DESC")
+    List<Valoracion> findByReceptorIdWithEmisorAndProyecto(@Param("idReceptor") Integer idReceptor);
+
+    /**
+     * Busca todas las valoraciones de un proyecto específico
+     * e incluye (FETCH) la info del emisor (estudiante).
+     */
+    @Query("SELECT v FROM Valoracion v " +
+            "JOIN FETCH v.emisor e " +
+            "WHERE v.proyecto.idProyecto = :idProyecto " +
+            "ORDER BY v.fecha DESC")
+    List<Valoracion> findByProyectoIdWithEmisor(@Param("idProyecto") Integer idProyecto);
+
+    boolean existsByEmisorIdUsuarioAndReceptorIdUsuarioAndProyectoIdProyecto(
+            Integer idEmisor, Integer idReceptor, Integer idProyecto);
 }
+

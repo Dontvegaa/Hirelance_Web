@@ -1,6 +1,7 @@
 -- ===============================================
 -- CREACIÓN DE BASE DE DATOS
 -- ===============================================
+DROP DATABASE IF EXISTS hirelance_db;
 CREATE DATABASE IF NOT EXISTS hirelance_db;
 USE hirelance_db;
 
@@ -158,13 +159,14 @@ CREATE TABLE valoraciones (
 );
 
 -- ===============================================
--- 12. SISTEMA DE NOTIFICACIONES
+-- 12. SISTEMA DE NOTIFICACIONES (MODIFICADO)
 -- ===============================================
 CREATE TABLE notificaciones (
                                 id_notificacion INT AUTO_INCREMENT PRIMARY KEY,
                                 id_usuario INT NOT NULL,
                                 tipo ENUM('mensaje','proyecto','valoracion','sistema') DEFAULT 'sistema',
                                 contenido TEXT,
+                                enlace VARCHAR(255),  -- ¡AQUÍ ESTÁ LA COLUMNA AGREGADA!
                                 leido BOOLEAN DEFAULT FALSE,
                                 fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                 FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)

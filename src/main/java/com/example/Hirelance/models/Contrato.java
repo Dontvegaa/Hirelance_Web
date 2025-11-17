@@ -1,54 +1,62 @@
 package com.example.Hirelance.models;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.math.BigDecimal;
 
-@Data
 @Entity
 @Table(name = "contratos")
 public class Contrato {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_contrato")
     private Integer idContrato;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_proyecto")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    @ManyToOne
+    @JoinColumn(name = "id_proyecto", nullable = false)
     private Proyecto proyecto;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_estudiante")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    @ManyToOne
+    @JoinColumn(name = "id_estudiante", nullable = false)
     private Usuario estudiante;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_contratista")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    @ManyToOne
+    @JoinColumn(name = "id_contratista", nullable = false)
     private Usuario contratista;
 
-    @Column(name = "fecha_inicio")
     private LocalDate fechaInicio;
-
-    @Column(name = "fecha_fin")
     private LocalDate fechaFin;
 
-    @Column(name = "total_pago")
-    private BigDecimal totalPago;
+    private BigDecimal totalPago; // Usamos BigDecimal para dinero
 
     @Enumerated(EnumType.STRING)
     private EstadoContrato estado;
 
-    // Enum basado en tu hirelance_db.sql
     public enum EstadoContrato {
         activo, completado, cancelado
     }
+
+    @PrePersist
+    public void prePersist() {
+        this.fechaInicio = LocalDate.now();
+        this.estado = EstadoContrato.activo;
+    }
+
+    // Getters y Setters
+    public Integer getIdContrato() { return idContrato; }
+    public void setIdContrato(Integer idContrato) { this.idContrato = idContrato; }
+    public Proyecto getProyecto() { return proyecto; }
+    public void setProyecto(Proyecto proyecto) { this.proyecto = proyecto; }
+    public Usuario getEstudiante() { return estudiante; }
+    public void setEstudiante(Usuario estudiante) { this.estudiante = estudiante; }
+    public Usuario getContratista() { return contratista; }
+    public void setContratista(Usuario contratista) { this.contratista = contratista; }
+    public LocalDate getFechaInicio() { return fechaInicio; }
+    public void setFechaInicio(LocalDate fechaInicio) { this.fechaInicio = fechaInicio; }
+    public LocalDate getFechaFin() { return fechaFin; }
+    public void setFechaFin(LocalDate fechaFin) { this.fechaFin = fechaFin; }
+    public BigDecimal getTotalPago() { return totalPago; }
+    public void setTotalPago(BigDecimal totalPago) { this.totalPago = totalPago; }
+    public EstadoContrato getEstado() { return estado; }
+    public void setEstado(EstadoContrato estado) { this.estado = estado; }
 }

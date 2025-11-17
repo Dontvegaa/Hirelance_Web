@@ -14,10 +14,17 @@ public class Postulacion {
     @Column(name = "id_postulacion")
     private Integer idPostulacion;
 
-    @Column(columnDefinition = "TEXT")
-    private String mensaje;
+    // Coincidiendo con la BD: 'propuesta'
+    @Column(name = "propuesta", columnDefinition = "TEXT")
+    private String propuesta;
 
-    private Double presupuestoPropuesto;
+    // Coincidiendo con la BD: 'monto_ofertado'
+    @Column(name = "monto_ofertado")
+    private Double montoOfertado;
+
+    // Coincidiendo con la BD: 'tiempo_estimado'
+    @Column(name = "tiempo_estimado")
+    private String tiempoEstimado;
 
     @Enumerated(EnumType.STRING)
     private EstadoPostulacion estado;
@@ -25,12 +32,10 @@ public class Postulacion {
     @Column(name = "fecha_postulacion")
     private LocalDateTime fechaPostulacion;
 
-    // Relación con el estudiante que se postula
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_estudiante")
     private Usuario estudiante;
 
-    // Relación con el proyecto al que se postula
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_proyecto")
     private Proyecto proyecto;
@@ -44,9 +49,6 @@ public class Postulacion {
     }
 
     public enum EstadoPostulacion {
-        pendiente,  // Cambia a minúscula para coincidir con la BD
-        aceptada,   // Cambia a minúscula
-        rechazada,  // Cambia a minúscula
-        cancelada
+        pendiente, aceptada, rechazada, cancelada
     }
 }

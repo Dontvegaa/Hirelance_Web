@@ -24,11 +24,29 @@
         <a href="/student/my-applications" class="block py-2 px-4 bg-orange-500 text-white rounded">
             <i class="fas fa-file-alt w-6 mr-2"></i> Mis Postulaciones
         </a>
+        <a href="/student/contracts" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-file-contract w-6 mr-2"></i> Mis Contratos
+        </a>
         <a href="/student/profile" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-user-graduate w-6 mr-2"></i> Mi Perfil
         </a>
-        <a href="/student/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+        <a href="/chat" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-envelope w-6 mr-2"></i> Mensajes
+        </a>
+        <a href="/student/notifications"
+           class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded flex justify-between items-center group transition">
+            <div class="flex items-center">
+                <i class="fas fa-bell w-6 mr-2 group-hover:text-orange-500 transition-colors"></i>
+                Notificaciones
+            </div>
+
+            <span th:if="${contadorNotificaciones > 0}"
+                  th:text="${contadorNotificaciones}"
+                  class="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm animate-pulse">
+    </span>
+        </a>
+        <a href="/student/report" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
+            <i class="fas fa-bug w-6 mr-2"></i> reportar Problema
         </a>
         <a href="/student/settings" class="block py-2 px-4 text-gray-400 hover:bg-gray-800 hover:text-white rounded">
             <i class="fas fa-cog w-6 mr-2"></i> Ajustes
@@ -92,7 +110,7 @@
                         <span class="text-sm font-medium" th:text="${post.proyecto.titulo}">Título del Proyecto</span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-sm text-orange-500" th:text="'$' + ${#numbers.formatDecimal(post.presupuestoPropuesto, 1, 2)}">$120.00</span>
+                        <span class="text-sm text-orange-500" th:text="'$' + ${#numbers.formatDecimal(post.montoOfertado, 1, 2)}">$120.00</span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span th:text="${#strings.capitalize(post.estado.name())}"
@@ -109,7 +127,7 @@
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
 
                         <div class="flex items-center justify-end space-x-4">
-                            <a th:href="@{/student/project/{id}/apply(id=${post.proyecto.idProyecto})}" class="text-gray-400 hover:text-white" title="Ver Proyecto">
+                            <a th:href="@{/student/application/{id}/details(id=${post.idPostulacion})}" class="text-gray-400 hover:text-white" title="Ver Detalles de Postulación">
                                 <i class="fas fa-eye"></i>
                             </a>
 

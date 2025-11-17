@@ -82,4 +82,8 @@ public interface PostulacionRepository extends JpaRepository<Postulacion, Intege
      * asegurar que le pertenece.
      */
     Optional<Postulacion> findByIdPostulacionAndEstudianteIdUsuario(Integer idPostulacion, Integer idEstudiante);
+
+    // ... (dentro de la interfaz)
+    // Este reemplaza al 'existsBy...' que usábamos antes, dándonos más datos.
+    Optional<Postulacion> findByEstudianteIdUsuarioAndProyectoIdProyecto(Integer idEstudiante, Integer idProyecto);
 }
