@@ -14,7 +14,7 @@ services:
       - key: SPRING_DATASOURCE_USERNAME
         value: u825468745_hire
       - key: SPRING_DATASOURCE_PASSWORD
-        value: Juas5378
+        sync: false  # Esto le dice a Render: "No la leas de aquí, la pondré en el Dashboard"
       - key: SPRING_JPA_HIBERNATE_DDL_AUTO
         value: update
       - key: SPRING_JPA_SHOW_SQL
@@ -31,5 +31,3 @@ services:
         value: ""  # ✅ DEJAR VACÍO - se configura en Render.com
       - key: BASE_URL
         value: https://hirelance.onrender.com
-      - key: PORT
-        value: 8000
