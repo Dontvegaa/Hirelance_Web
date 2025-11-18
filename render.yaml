@@ -20,3 +20,13 @@ services:
         value: true
       - key: SPRING_JPA_SHOW_SQL
         value: false
+      - key: MAIL_HOST
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: 587
+      - key: MAIL_USERNAME
+        value: lilvegaxx@gmail.com
+      - key: MAIL_PASSWORD
+        sync: false  # sync: false significa que la metes manual en el dashboard por seguridad
+      - key: BASE_URL
+        value: https://hirelance.onrender.com # Pon tu URL real aquí
