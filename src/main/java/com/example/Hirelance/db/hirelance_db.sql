@@ -3,14 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 18, 2025 at 05:21 AM
+-- Generation Time: Nov 18, 2025 at 08:42 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
-
-DROP DATABASE IF EXISTS hirelance_db;
-CREATE DATABASE IF NOT EXISTS hirelance_db;
-USE hirelance_db;
-
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -31,8 +26,6 @@ SET time_zone = "+00:00";
 --
 -- Table structure for table `categorias`
 --
-
-
 
 CREATE TABLE `categorias` (
                               `id_categoria` int(11) NOT NULL,
@@ -205,6 +198,26 @@ INSERT INTO `notificaciones` (`id_notificacion`, `id_usuario`, `tipo`, `contenid
                                                                                                                     (2, 2, 'proyecto', '¡Felicidades! Contrato generado para API Rest.', '/student/contracts', 0, '2025-11-18 04:12:45'),
                                                                                                                     (3, 11, 'proyecto', 'Nueva postulación de Luis en Sistema Inventarios.', '/client/application/5/details', 0, '2025-11-18 04:12:45'),
                                                                                                                     (4, 2, 'mensaje', 'Tienes un nuevo mensaje de Carlos.', '/chat/11', 0, '2025-11-18 04:12:45');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `password_reset_token`
+--
+
+CREATE TABLE `password_reset_token` (
+                                        `id` bigint(20) NOT NULL,
+                                        `fecha_expiracion` datetime(6) DEFAULT NULL,
+                                        `token` varchar(255) DEFAULT NULL,
+                                        `id_usuario` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `password_reset_token`
+--
+
+INSERT INTO `password_reset_token` (`id`, `fecha_expiracion`, `token`, `id_usuario`) VALUES
+    (5, '2025-11-19 01:06:43.000000', '27031105-ba92-49f7-b520-cea51f0ea5fe', 2);
 
 -- --------------------------------------------------------
 
@@ -439,21 +452,21 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `nombre`, `apellido`, `correo`, `contrasena`, `dui`, `tipo`, `telefono`, `fecha_registro`, `estado`) VALUES
-                                                                                                                                               (1, 'Super', 'Admin', 'admin@hirelance.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000000-0', 'admin', '2222-0000', '2025-11-18 04:12:45', 'activo'),
-                                                                                                                                               (2, 'Juan', 'Perez', 'juan@estudiante.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000001-1', 'estudiante', '6001-0001', '2025-11-18 04:12:45', 'activo'),
-                                                                                                                                               (3, 'Maria', 'Gomez', 'maria@estudiante.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000002-2', 'estudiante', '6002-0002', '2025-11-18 04:12:45', 'activo'),
-                                                                                                                                               (4, 'Pedro', 'Rivas', 'pedro@estudiante.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000003-3', 'estudiante', '6003-0003', '2025-11-18 04:12:45', 'activo'),
-                                                                                                                                               (5, 'Ana', 'Torres', 'ana@estudiante.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000004-4', 'estudiante', '6004-0004', '2025-11-18 04:12:45', 'activo'),
-                                                                                                                                               (6, 'Luis', 'Diaz', 'luis@estudiante.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000005-5', 'estudiante', '6005-0005', '2025-11-18 04:12:45', 'activo'),
-                                                                                                                                               (7, 'Carla', 'Mendez', 'carla@estudiante.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000006-6', 'estudiante', '6006-0006', '2025-11-18 04:12:45', 'activo'),
-                                                                                                                                               (8, 'Diego', 'Luna', 'diego@estudiante.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000007-7', 'estudiante', '6007-0007', '2025-11-18 04:12:45', 'activo'),
-                                                                                                                                               (9, 'Sofia', 'Castillo', 'sofia@estudiante.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000008-8', 'estudiante', '6008-0008', '2025-11-18 04:12:45', 'activo'),
-                                                                                                                                               (10, 'Javier', 'Sosa', 'javier@estudiante.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000009-9', 'estudiante', '6009-0009', '2025-11-18 04:12:45', 'activo'),
-                                                                                                                                               (11, 'Carlos', 'CEO', 'carlos@techsolutions.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '10000001-1', 'contratista', '7001-0001', '2025-11-18 04:12:45', 'activo'),
-                                                                                                                                               (12, 'Elena', 'Dueña', 'elena@restaurante.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '10000002-2', 'contratista', '7002-0002', '2025-11-18 04:12:45', 'activo'),
-                                                                                                                                               (13, 'Roberto', 'Gerente', 'roberto@tienda.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '10000003-3', 'contratista', '7003-0003', '2025-11-18 04:12:45', 'activo'),
-                                                                                                                                               (14, 'Laura', 'HR', 'laura@banco.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '10000004-4', 'contratista', '7004-0004', '2025-11-18 04:12:45', 'activo'),
-                                                                                                                                               (15, 'Mario', 'Founder', 'mario@startup.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '10000005-5', 'contratista', '7005-0005', '2025-11-18 04:12:45', 'activo');
+                                                                                                                                               (1, 'Super', 'Admin', 'lilvegaxx+admin@gmail.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000000-0', 'admin', '2222-0000', '2025-11-18 04:12:45', 'activo'),
+                                                                                                                                               (2, 'Juan', 'Perez', 'lilvegaxx+juan@gmail.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000001-1', 'estudiante', '6001-0001', '2025-11-18 04:12:45', 'activo'),
+                                                                                                                                               (3, 'Maria', 'Gomez', 'lilvegaxx+maria@gmail.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000002-2', 'estudiante', '6002-0002', '2025-11-18 04:12:45', 'activo'),
+                                                                                                                                               (4, 'Pedro', 'Rivas', 'lilvegaxx+pedro@gmail.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000003-3', 'estudiante', '6003-0003', '2025-11-18 04:12:45', 'activo'),
+                                                                                                                                               (5, 'Ana', 'Torres', 'lilvegaxx+ana@gmail.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000004-4', 'estudiante', '6004-0004', '2025-11-18 04:12:45', 'activo'),
+                                                                                                                                               (6, 'Luis', 'Diaz', 'lilvegaxx+luis@gmail.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000005-5', 'estudiante', '6005-0005', '2025-11-18 04:12:45', 'activo'),
+                                                                                                                                               (7, 'Carla', 'Mendez', 'lilvegaxx+carla@gmail.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000006-6', 'estudiante', '6006-0006', '2025-11-18 04:12:45', 'activo'),
+                                                                                                                                               (8, 'Diego', 'Luna', 'lilvegaxx+diego@gmail.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000007-7', 'estudiante', '6007-0007', '2025-11-18 04:12:45', 'activo'),
+                                                                                                                                               (9, 'Sofia', 'Castillo', 'lilvegaxx+sofia@gmail.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '00000008-8', 'estudiante', '6008-0008', '2025-11-18 04:12:45', 'activo'),
+                                                                                                                                               (10, 'Javier', 'Sosa', 'lilvegaxx+javier@gmail.com', '$2a$10$bdEgjZkXbKz5JnuVSv0FsOnWerN9R6ih5SqDnBDD7fq.oDemJCwGS', '00000009-9', 'estudiante', '6009-0009', '2025-11-18 04:12:45', 'activo'),
+                                                                                                                                               (11, 'Carlos', 'CEO', 'lilvegaxx+carlos@gmail.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '10000001-1', 'contratista', '7001-0001', '2025-11-18 04:12:45', 'activo'),
+                                                                                                                                               (12, 'Elena', 'Dueña', 'lilvegaxx+elena@gmail.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '10000002-2', 'contratista', '7002-0002', '2025-11-18 04:12:45', 'activo'),
+                                                                                                                                               (13, 'Roberto', 'Gerente', 'lilvegaxx+roberto@gmail.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '10000003-3', 'contratista', '7003-0003', '2025-11-18 04:12:45', 'activo'),
+                                                                                                                                               (14, 'Laura', 'HR', 'lilvegaxx+laura@gmail.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '10000004-4', 'contratista', '7004-0004', '2025-11-18 04:12:45', 'activo'),
+                                                                                                                                               (15, 'Mario', 'Founder', 'lilvegaxx+mario@gmail.com', '$2a$10$AzpUNEOBjLsDDSsnJjKlfuZIo3lQa4epetW1M8PNnPcSW9cS7cena', '10000005-5', 'contratista', '7005-0005', '2025-11-18 04:12:45', 'activo');
 
 -- --------------------------------------------------------
 
@@ -533,6 +546,13 @@ ALTER TABLE `mensajes`
 ALTER TABLE `notificaciones`
     ADD PRIMARY KEY (`id_notificacion`),
   ADD KEY `id_usuario` (`id_usuario`);
+
+--
+-- Indexes for table `password_reset_token`
+--
+ALTER TABLE `password_reset_token`
+    ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UKjohu5tq9i7cy1fgyemmlme0p2` (`id_usuario`);
 
 --
 -- Indexes for table `perfil_contratista`
@@ -643,6 +663,12 @@ ALTER TABLE `notificaciones`
     MODIFY `id_notificacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT for table `password_reset_token`
+--
+ALTER TABLE `password_reset_token`
+    MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
 -- AUTO_INCREMENT for table `perfil_contratista`
 --
 ALTER TABLE `perfil_contratista`
@@ -735,6 +761,12 @@ ALTER TABLE `mensajes`
 --
 ALTER TABLE `notificaciones`
     ADD CONSTRAINT `notificaciones_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
+
+--
+-- Constraints for table `password_reset_token`
+--
+ALTER TABLE `password_reset_token`
+    ADD CONSTRAINT `FKleihsn8590arthkl1dwjq774y` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`);
 
 --
 -- Constraints for table `perfil_contratista`
