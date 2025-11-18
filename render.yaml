@@ -13,7 +13,7 @@ services:
       - key: SPRING_DATASOURCE_USERNAME
         value: u825468745_hire
       - key: SPRING_DATASOURCE_PASSWORD
-        sync: false
+        sync: Juas5378
       - key: SPRING_JPA_HIBERNATE_DDL_AUTO
         value: update
       - key: SPRING_THYMELEAF_CACHE
