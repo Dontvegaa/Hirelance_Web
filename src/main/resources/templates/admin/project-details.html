@@ -76,7 +76,9 @@
                     <tbody class="divide-y divide-gray-800">
                     <tr th:each="post : ${postulaciones}">
                         <td class="px-6 py-4" th:text="${post.estudiante.nombre} + ' ' + ${post.estudiante.apellido}"></td>
-                        <td class="px-6 py-4 text-orange-500" th:text="'$' + ${#numbers.formatDecimal(post.presupuestoPropuesto, 1, 2)}"></td>
+
+                        <td class="px-6 py-4 text-orange-500" th:text="'$' + ${#numbers.formatDecimal(post.montoOfertado, 1, 2)}"></td>
+
                         <td class="px-6 py-4">
                                     <span th:text="${post.estado.name()}"
                                           th:classappend="${post.estado.name() == 'aceptada'} ? 'bg-green-700 text-green-300' :

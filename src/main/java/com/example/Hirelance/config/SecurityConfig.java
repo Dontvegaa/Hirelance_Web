@@ -45,7 +45,9 @@ public class SecurityConfig {
                                 "/js/**",         // Tus archivos JavaScript
                                 "/css/**",        // Tus archivos CSS
                                 "/uploads/**",
-                                "/downloads/**"// ¡IMPORTANTE! Para ver las fotos de perfil subidas
+                                "/downloads/**",// ¡IMPORTANTE! Para ver las fotos de perfil subidas
+                                "/forgot-password",  // <-- AGREGAR
+                                "/reset-password"
                         ).permitAll()
 
                         // --- PROTEGER TODAS LAS DEMÁS RUTAS ---
