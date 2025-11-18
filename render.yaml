@@ -1,3 +1,4 @@
+# render.yaml CORREGIDO
 services:
   - type: web
     name: hirelance
@@ -13,20 +14,22 @@ services:
       - key: SPRING_DATASOURCE_USERNAME
         value: u825468745_hire
       - key: SPRING_DATASOURCE_PASSWORD
-        sync: Juas5378
+        value: Juas5378
       - key: SPRING_JPA_HIBERNATE_DDL_AUTO
         value: update
-      - key: SPRING_THYMELEAF_CACHE
-        value: true
       - key: SPRING_JPA_SHOW_SQL
         value: false
+      - key: SPRING_THYMELEAF_CACHE
+        value: true
       - key: MAIL_HOST
-        value: smtp.gmail.com
+        value: smtp.sendgrid.net
       - key: MAIL_PORT
-        value: 587
+        value: 2525
       - key: MAIL_USERNAME
-        value: lilvegaxx@gmail.com
+        value: apikey
       - key: MAIL_PASSWORD
-        sync: false  # sync: false significa que la metes manual en el dashboard por seguridad
+        value: ""  # ✅ DEJAR VACÍO - se configura en Render.com
       - key: BASE_URL
-        value: https://hirelance.onrender.com # Pon tu URL real aquí
+        value: https://hirelance.onrender.com
+      - key: PORT
+        value: 8000

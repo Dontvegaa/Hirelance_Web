@@ -1,41 +1,23 @@
-# --- ETAPA 1: Construcción (Build) ---
-# Usamos una imagen de Java 17 (JDK) para compilar tu código
+# Versión ligeramente mejorada con health check
 FROM eclipse-temurin:17-jdk-jammy AS builder
 
-# Establecemos el directorio de trabajo
 WORKDIR /app
-
-# Copiamos los archivos de Maven para descargar dependencias
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
-
-# Damos permisos de ejecución al wrapper de Maven
 RUN chmod +x ./mvnw
+RUN ./mvnw dependency:go-offline -B
 
-# Descargamos las dependencias (esto se guarda en caché)
-RUN ./mvnw dependency:go-offline
-
-# Copiamos el resto del código fuente
 COPY src/ ./src
-
-# Compilamos el proyecto y creamos el .war (saltamos los tests)
-# Esto creará tu "Hirelance-0.0.1-SNAPSHOT.war"
 RUN ./mvnw package -DskipTests
 
-
-# --- ETAPA 2: Ejecución (Run) ---
-# Usamos una imagen de Java 17 (JRE) mucho más ligera para correr la app
 FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
-
-# Copiamos solo el .war construido desde la etapa 'builder'
-# Usamos un comodín (*.war) para que coincida con "Hirelance-0.0.1-SNAPSHOT.war"
 COPY --from=builder /app/target/*.war app.war
 
-# Exponemos el puerto - puede ser sobrescrito con variables de entorno
-EXPOSE ${PORT:-8000}
+# Health check para Render
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:${PORT:-8000}/actuator/health || exit 1
 
-# El comando que se ejecutará cuando inicie el contenedor
-# (Spring Boot permite ejecutar .war empaquetados de esta forma)
+EXPOSE ${PORT:-8000}
 ENTRYPOINT ["java", "-jar", "app.war"]
